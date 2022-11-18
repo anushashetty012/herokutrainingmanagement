@@ -53,7 +53,7 @@ public class AdminService
         offset = limit *(page-1);
         List<CourseList> courses = jdbcTemplate.query(GET_COURSE,(rs, rowNum) -> {
             return new CourseList(rs.getInt("courseId"),rs.getString("courseName"),rs.getString("trainer"),rs.getString("trainingMode"),rs.getDate("startDate"),rs.getDate("endDate"),rs.getTime("duration"),rs.getTime("startTime"),rs.getTime("endTime"),rs.getString("completionStatus"));
-        },completionStatus,page,limit);
+        },completionStatus,offset,limit);
         if (courses.size()!=0)
         {
             map.put(courses.size(),courses);
@@ -225,7 +225,10 @@ public class AdminService
             }
             checkStartTimeExist(course);
             checkEndTimeExist(course);
-            checkTime(course);
+            if(i==0)
+            {
+                checkTime(course);
+            }
         }
         catch (NullPointerException e)
         {
