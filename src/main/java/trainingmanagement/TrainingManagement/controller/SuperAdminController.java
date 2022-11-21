@@ -44,7 +44,7 @@ public class SuperAdminController
         try{
             roleStatus = superAdminService.changeRole(employeeRole);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
         return ResponseEntity.of(Optional.of( roleStatus));
     }
@@ -61,7 +61,7 @@ public class SuperAdminController
         }
         catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
