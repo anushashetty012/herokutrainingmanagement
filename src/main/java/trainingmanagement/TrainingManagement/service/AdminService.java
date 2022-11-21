@@ -14,8 +14,7 @@ import trainingmanagement.TrainingManagement.response.EmployeeInfo;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,10 +175,16 @@ public class AdminService
     }
     public void checkStartTimeForCurrentDate(Course course) throws CourseInfoIntegrityException
     {
-        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-        jdbcTemplate.update("insert into dummy1 values(?)",currentTimestamp);
+        Instant instant = Instant.now();
+        // use toString() method to convert instant object into String
+        String d1 = instant.toString();
+        Instant s = Instant.parse(d1);
+        ZoneId.of("Asia/Kolkata");
+        LocalDateTime l = LocalDateTime.ofInstant(s, ZoneId.of("Asia/Kolkata"));
+        System.out.println(l);
+     //   jdbcTemplate.update("insert into dummy1 values(?)",currentTimestamp);
         Timestamp startTimestamp=createTimestamp(course.getStartDate(),course.getStartTime());
-        if (0 > startTimestamp.compareTo(currentTimestamp))
+        if (0 > startTimestamp.compareTo(Timestamp.valueOf(l)))
         {
             throw new CourseInfoIntegrityException("Start time should be greater than current time");
         }
