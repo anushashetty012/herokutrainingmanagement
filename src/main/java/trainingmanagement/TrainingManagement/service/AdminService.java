@@ -14,6 +14,8 @@ import trainingmanagement.TrainingManagement.response.EmployeeInfo;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,12 +65,12 @@ public class AdminService
     }
     public Timestamp createTimestamp(Date date, Time time)
     {
-
         Timestamp t= new Timestamp(date.getYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds(),0);
         return t;
     }
 
-    public String createCourse(Course course) throws CourseInfoIntegrityException {
+    public String createCourse(Course course) throws CourseInfoIntegrityException
+    {
         courseInfoIntegrity(course);
         Timestamp startTimestamp=createTimestamp(course.getStartDate(),course.getStartTime());
         Timestamp endTimestamp=null;
@@ -172,6 +174,15 @@ public class AdminService
         String query = "update course set courseName =?, trainer=?, trainingMode=?, startDate=?, endDate =?, duration=?, startTime =?, endTime =?, meetingInfo=?,startTimestamp=?,endTimestamp=? where courseId = ? and deleteStatus=0";
         return jdbcTemplate.update(query, course.getCourseName(),course.getTrainer(),course.getTrainingMode(),course.getStartDate(),course.getEndDate(),course.getDuration(),course.getStartTime(),course.getEndTime(),course.getMeetingInfo(),startTimestamp,endTimestamp,course.getCourseId());
     }
+    public void checkStartTimeForCurrentDate(Course course) throws CourseInfoIntegrityException
+    {
+        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+        Timestamp startTimestamp=createTimestamp(course.getStartDate(),course.getStartTime());
+        if (0 > startTimestamp.compareTo(currentTimestamp))
+        {
+            throw new CourseInfoIntegrityException("Start time should be greater than current time");
+        }
+    }
 
     public void checkStartTimeExist(Course course) throws CourseInfoIntegrityException
     {
@@ -198,7 +209,7 @@ public class AdminService
             int i=course.getStartTime().compareTo(course.getEndTime());
             if(!(i<0))
             {
-                throw new CourseInfoIntegrityException("start time should be smaller end time");
+                throw new CourseInfoIntegrityException("start time should be smaller than end time");
             }
         }
     }
@@ -206,17 +217,26 @@ public class AdminService
     {
         if (course.getCourseName().isEmpty())
         {
-            throw new CourseInfoIntegrityException("CourseName can't be empty");
+            throw new CourseInfoIntegrityException("Course Name can't be empty");
         }
         courseModeIntegrity(course.getTrainingMode());
         long millis=System.currentTimeMillis();
         java.sql.Date date=new java.sql.Date(millis);
         String str= date.toString();
 
-        if(0>course.getStartDate().compareTo(Date.valueOf(str)))
+        LocalDate firstDate = Date.valueOf(str).toLocalDate();
+        LocalDate secondDate = course.getStartDate().toLocalDate();
+        int dateStatus = firstDate.compareTo(secondDate);
+
+        if(0 < dateStatus)
         {
             throw new CourseInfoIntegrityException("start date can't be before  current date");
         }
+        if (dateStatus == 0)
+        {
+            checkStartTimeForCurrentDate(course);
+        }
+
         try {
             int i=course.getStartDate().compareTo(course.getEndDate());
             if(i>0)

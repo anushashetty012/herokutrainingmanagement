@@ -151,7 +151,7 @@ public class AdminController
         int updatedCourse = 0;
         try {
             updatedCourse = adminRepository.updateCourse(course);
-        } catch (CourseInfoIntegrityException e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if(updatedCourse == 0){
