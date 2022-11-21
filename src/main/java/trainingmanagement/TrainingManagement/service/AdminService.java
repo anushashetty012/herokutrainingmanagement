@@ -176,13 +176,10 @@ public class AdminService
     public void checkStartTimeForCurrentDate(Course course) throws CourseInfoIntegrityException
     {
         Instant instant = Instant.now();
-        // use toString() method to convert instant object into String
         String d1 = instant.toString();
         Instant s = Instant.parse(d1);
         ZoneId.of("Asia/Kolkata");
         LocalDateTime l = LocalDateTime.ofInstant(s, ZoneId.of("Asia/Kolkata"));
-        System.out.println(l);
-     //   jdbcTemplate.update("insert into dummy1 values(?)",currentTimestamp);
         Timestamp startTimestamp=createTimestamp(course.getStartDate(),course.getStartTime());
         if (0 > startTimestamp.compareTo(Timestamp.valueOf(l)))
         {
@@ -243,8 +240,7 @@ public class AdminService
         }
         if (startToCurrentDateStatus == 0)
         {
-            jdbcTemplate.update("insert into dummy values(?)",startToCurrentDateStatus);
-
+            checkStartTimeExist(course);
             checkStartTimeForCurrentDate(course);
         }
 
