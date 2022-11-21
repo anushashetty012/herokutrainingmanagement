@@ -89,8 +89,9 @@ public class SuperAdminService {
 
 
 
-    public String changeRole(EmployeeRole employeeRole) throws EmployeeNotExistException, SuperAdminIdException {
+    public String changeRole(EmployeeRole employeeRole) throws EmployeeNotExistException, SuperAdminIdException, EmployeeExistException {
         isSuperAdminId(employeeRole.getEmpId());
+        employeeExist(employeeRole.getEmpId());
         checkEmployeeDeleted(employeeRole.getEmpId());
         jdbcTemplate.update(CHANGING_ROLES,employeeRole.getRoleName(),employeeRole.getEmpId());
         return "Role changed to "+employeeRole.getRoleName();
