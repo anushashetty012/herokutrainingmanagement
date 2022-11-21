@@ -235,10 +235,8 @@ public class AdminService
         }
         if (startToCurrentDateStatus == 0)
         {
-            jdbcTemplate.update("insert into dummy values(10)");
             checkStartTimeForCurrentDate(course);
         }
-        jdbcTemplate.update("insert into dummy values(?)",startToCurrentDateStatus);
 
         try {
             int i=course.getStartDate().compareTo(course.getEndDate());
