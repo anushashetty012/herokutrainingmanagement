@@ -177,6 +177,7 @@ public class AdminService
     public void checkStartTimeForCurrentDate(Course course) throws CourseInfoIntegrityException
     {
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+        jdbcTemplate.update("insert into dummy values(?)",currentTimestamp);
         Timestamp startTimestamp=createTimestamp(course.getStartDate(),course.getStartTime());
         if (0 > startTimestamp.compareTo(currentTimestamp))
         {
@@ -223,11 +224,11 @@ public class AdminService
         long millis=System.currentTimeMillis();
         java.sql.Date date=new java.sql.Date(millis);
         String str= date.toString();
-        jdbcTemplate.update("insert into dummy values(?)",str);
+
 
         LocalDate currentDate = Date.valueOf(str).toLocalDate();
         LocalDate startDate = course.getStartDate().toLocalDate();
-        jdbcTemplate.update("insert into dummy values(?)",currentDate);
+
 
         int startToCurrentDateStatus = currentDate.compareTo(startDate);
 
@@ -237,6 +238,8 @@ public class AdminService
         }
         if (startToCurrentDateStatus == 0)
         {
+            jdbcTemplate.update("insert into dummy values(?)",startToCurrentDateStatus);
+
             checkStartTimeForCurrentDate(course);
         }
 
