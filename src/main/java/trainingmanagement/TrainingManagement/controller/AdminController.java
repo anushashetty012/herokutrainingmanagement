@@ -137,7 +137,14 @@ public class AdminController
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> assignCourseToManager(@PathVariable int courseId, @RequestBody List<MultipleEmployeeRequest> courseToManager)
     {
-        String assignStatus = adminRepository.assignCourseToManager(courseId,courseToManager);
+        String assignStatus;
+        try
+        {
+            assignStatus = adminRepository.assignCourseToManager(courseId,courseToManager);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+
         if ( assignStatus == null )
         {
             return new ResponseEntity<>("This course is already allocated to this manager",HttpStatus.INTERNAL_SERVER_ERROR);

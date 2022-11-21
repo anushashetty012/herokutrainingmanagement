@@ -130,13 +130,20 @@ public class AdminService
         }
         return null;
     }
-
-    public String assignCourseToManager(int courseId, List<MultipleEmployeeRequest> courseToManager)
+    public void checkManagersList( List<MultipleEmployeeRequest> courseToManager)
     {
+
+    }
+
+    public String assignCourseToManager(int courseId, List<MultipleEmployeeRequest> courseToManager) throws ManagerNotExistException, SuperAdminIdException {
+
         int count=0;
         int noOfManagers = courseToManager.size();
         for (int i = 0; i < noOfManagers; i++)
         {
+
+            checkManagerExist(courseToManager.get(i).getEmpId());
+            isSuperAdminId(courseToManager.get(i).getEmpId());
             String query = "select managerId from ManagersCourses where managerId=? and courseId=?";
             List<ManagersCourses> managerId = jdbcTemplate.query(query, (rs, rowNum) -> {
                 return new ManagersCourses(rs.getString("managerId"));
