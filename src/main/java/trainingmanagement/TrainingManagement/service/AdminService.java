@@ -117,7 +117,7 @@ public class AdminService
 
     public Map<Integer,List<EmployeeInfo>> getManagersBySearchkey(int page, int limit, String searchKey)
     {
-        String GET_MANAGERS = "SELECT Employee.emp_Id,emp_Name,designation FROM Employee, employee_role WHERE Employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND Employee.delete_status=false and (Employee.emp_id=? or Employee.emp_name like ? or Employee.designation like ?) LIMIT ?,?";
+        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?) LIMIT ?,?";
         Map map = new HashMap<Integer,List>();
         offset = limit *(page-1);
         List<EmployeeInfo> employeeDetails =  jdbcTemplate.query(GET_MANAGERS,(rs, rowNum) -> {
@@ -170,7 +170,7 @@ public class AdminService
         } catch (CourseInfoIntegrityException e) {
 
         }
-        String query = "update course set courseName =?, trainer=?, trainingMode=?, startDate=?, endDate =?, duration=?, startTime =?, endTime =?, meetingInfo=?,startTimestamp=?,endTimestamp=? where courseId = ? and deleteStatus=0";
+        String query = "update Course set courseName =?, trainer=?, trainingMode=?, startDate=?, endDate =?, duration=?, startTime =?, endTime =?, meetingInfo=?,startTimestamp=?,endTimestamp=? where courseId = ? and deleteStatus=0";
         return jdbcTemplate.update(query, course.getCourseName(),course.getTrainer(),course.getTrainingMode(),course.getStartDate(),course.getEndDate(),course.getDuration(),course.getStartTime(),course.getEndTime(),course.getMeetingInfo(),startTimestamp,endTimestamp,course.getCourseId());
     }
     public void checkStartTimeForCurrentDate(Course course) throws CourseInfoIntegrityException
