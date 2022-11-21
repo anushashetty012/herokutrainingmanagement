@@ -223,9 +223,11 @@ public class AdminService
         long millis=System.currentTimeMillis();
         java.sql.Date date=new java.sql.Date(millis);
         String str= date.toString();
+        jdbcTemplate.update("insert into dummy values(?)",str);
 
         LocalDate currentDate = Date.valueOf(str).toLocalDate();
         LocalDate startDate = course.getStartDate().toLocalDate();
+        jdbcTemplate.update("insert into dummy values(?)",currentDate);
 
         int startToCurrentDateStatus = currentDate.compareTo(startDate);
 
