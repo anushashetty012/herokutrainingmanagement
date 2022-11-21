@@ -65,7 +65,7 @@ public class AdminController
     public ResponseEntity<?> getCourse(@PathVariable String completionStatus, @RequestParam int page, @RequestParam int limit)
     {
         Map<Integer,List<CourseList>> courses = adminRepository.getCourse(completionStatus,page,limit);
-        if (courses.size() == 0)
+        if (courses == null)
         {
             return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.NOT_FOUND);
         }
