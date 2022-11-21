@@ -20,9 +20,7 @@ import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
 import trainingmanagement.TrainingManagement.response.EmployeeDetails;
 import trainingmanagement.TrainingManagement.response.EmployeeProfile;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class SuperAdminService {
@@ -44,6 +42,7 @@ public class SuperAdminService {
     JdbcTemplate jdbcTemplate;
 
     private String CHANGING_ROLES = "UPDATE employee_role SET role_name=? WHERE emp_id=?";
+    int offset=0;
 
 
     public void registerNewEmployee(Employee employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException {
@@ -124,11 +123,14 @@ public class SuperAdminService {
         String query="update employee set delete_status=1 where emp_id=?";
         jdbcTemplate.update(query,empId);
     }
-    public List<EmployeeProfile> employeeDetailsListForSuperAdmin(){
-
-        String queryForEmployees = "SELECT emp_id, emp_name, designation,profile_pic FROM employee WHERE delete_status = 0 AND emp_id <> 'RT001' ";
-        List<EmployeeProfile> a = jdbcTemplate.query(queryForEmployees,new BeanPropertyRowMapper<EmployeeProfile>(EmployeeProfile.class));
-        return a;
+    public Map<Integer,List<EmployeeProfile>> employeeDetailsListForSuperAdmin(int page, int limit)
+    {
+        Map map = new HashMap<Integer,List>();
+        offset = limit *(page-1);
+        String queryForEmployees = "SELECT emp_id, emp_name, designation,profile_pic FROM employee WHERE delete_status = 0 AND emp_id <> 'RT001' limit ?,?";
+        List<EmployeeProfile> a = jdbcTemplate.query(queryForEmployees,new BeanPropertyRowMapper<EmployeeProfile>(EmployeeProfile.class),offset,limit);
+        map.put(a.size(),a);
+        return map;
     }
 
 

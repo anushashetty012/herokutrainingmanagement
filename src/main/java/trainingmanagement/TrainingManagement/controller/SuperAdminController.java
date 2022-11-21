@@ -67,8 +67,8 @@ public class SuperAdminController
 
     @GetMapping("/employees")
     @PreAuthorize("hasRole('super_admin')")
-    public ResponseEntity<?> employees()
+    public ResponseEntity<?> employees(@RequestParam int page, @RequestParam int limit)
     {
-       return ResponseEntity.status(HttpStatus.OK).body(superAdminService.employeeDetailsListForSuperAdmin());
+       return ResponseEntity.status(HttpStatus.OK).body(superAdminService.employeeDetailsListForSuperAdmin(page,limit));
     }
 }
