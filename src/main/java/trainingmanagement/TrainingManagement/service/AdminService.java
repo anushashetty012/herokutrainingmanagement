@@ -226,20 +226,19 @@ public class AdminService
 
         LocalDate currentDate = Date.valueOf(str).toLocalDate();
         LocalDate startDate = course.getStartDate().toLocalDate();
-        LocalDate endDate = course.getEndDate().toLocalDate();
-        int startToCurrentDateStatus = currentDate.compareTo(startDate);
-        int startToEndDateStatus = startDate.compareTo(endDate);
 
-        if(0 > startToCurrentDateStatus)
+        int startToCurrentDateStatus = currentDate.compareTo(startDate);
+
+        if(0 < startToCurrentDateStatus)
         {
             throw new CourseInfoIntegrityException("start date can't be before  current date");
         }
-        if (startToEndDateStatus == 0)
+        if (startToCurrentDateStatus == 0)
         {
             jdbcTemplate.update("insert into dummy values(10)");
             checkStartTimeForCurrentDate(course);
         }
-        jdbcTemplate.update("insert into dummy values(?)",startToEndDateStatus);
+        jdbcTemplate.update("insert into dummy values(?)",startToCurrentDateStatus);
 
         try {
             int i=course.getStartDate().compareTo(course.getEndDate());
