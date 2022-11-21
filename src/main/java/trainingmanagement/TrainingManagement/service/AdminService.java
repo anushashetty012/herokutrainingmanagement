@@ -224,23 +224,22 @@ public class AdminService
         java.sql.Date date=new java.sql.Date(millis);
         String str= date.toString();
 
-        LocalDate firstDate = Date.valueOf(str).toLocalDate();
-        LocalDate secondDate = course.getStartDate().toLocalDate();
-        System.out.println(firstDate);
-        System.out.println(secondDate);
-        int dateStatus = firstDate.compareTo(secondDate);
+        LocalDate currentDate = Date.valueOf(str).toLocalDate();
+        LocalDate startDate = course.getStartDate().toLocalDate();
+        LocalDate endDate = course.getEndDate().toLocalDate();
+        int startToCurrentDateStatus = currentDate.compareTo(startDate);
+        int startToEndDateStatus = startDate.compareTo(endDate);
 
-        if(0 < dateStatus)
+        if(0 > startToCurrentDateStatus)
         {
-            System.out.println(dateStatus);
             throw new CourseInfoIntegrityException("start date can't be before  current date");
         }
-        if (dateStatus == 0)
+        if (startToEndDateStatus == 0)
         {
             jdbcTemplate.update("insert into dummy values(10)");
             checkStartTimeForCurrentDate(course);
         }
-        jdbcTemplate.update("insert into dummy values(?)",dateStatus);
+        jdbcTemplate.update("insert into dummy values(?)",startToEndDateStatus);
 
         try {
             int i=course.getStartDate().compareTo(course.getEndDate());
