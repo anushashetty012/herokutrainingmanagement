@@ -177,7 +177,7 @@ public class AdminService
     public void checkStartTimeForCurrentDate(Course course) throws CourseInfoIntegrityException
     {
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-        jdbcTemplate.update("insert into dummy values(?)",currentTimestamp);
+        jdbcTemplate.update("insert into dummy1 values(?)",currentTimestamp);
         Timestamp startTimestamp=createTimestamp(course.getStartDate(),course.getStartTime());
         if (0 > startTimestamp.compareTo(currentTimestamp))
         {
