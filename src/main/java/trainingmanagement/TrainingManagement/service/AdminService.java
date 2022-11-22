@@ -135,13 +135,13 @@ public class AdminService
 
     }
 
-    public String assignCourseToManager(int courseId, List<MultipleEmployeeRequest> courseToManager) throws ManagerNotExistException, SuperAdminIdException {
+    public String assignCourseToManager(int courseId, List<MultipleEmployeeRequest> courseToManager) throws ManagerNotExistException, SuperAdminIdException, EmployeeNotExistException {
 
         int count=0;
         int noOfManagers = courseToManager.size();
         for (int i = 0; i < noOfManagers; i++)
         {
-
+            checkEmployeeExist(courseToManager.get(i).getEmpId());
             checkManagerExist(courseToManager.get(i).getEmpId());
             isSuperAdminId(courseToManager.get(i).getEmpId());
             String query = "select managerId from ManagersCourses where managerId=? and courseId=?";
