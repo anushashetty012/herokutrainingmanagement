@@ -25,4 +25,9 @@ public class Course
     private String meetingInfo;
     @JsonIgnore
     private boolean deleteStatus;
+
+    public Course(Date startDate, Time startTime) {
+        this.startDate = startDate;
+        this.startTime = startTime;
+    }
 }

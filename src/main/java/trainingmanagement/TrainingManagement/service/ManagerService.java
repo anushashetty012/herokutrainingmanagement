@@ -23,7 +23,7 @@ public class ManagerService
     {
         Map map = new HashMap<Integer,List>();
         offset = limit *(page-1);
-        String query = "SELECT course.courseId,courseName,trainer,trainingMode,startDate,endDate,duration,startTime,endTime,completionStatus FROM Course,managerscourses WHERE course.courseId = managerscourses.courseID and managerID=? and completionStatus=? and deleteStatus=false";
+        String query = "SELECT Course.courseId,courseName,trainer,trainingMode,startDate,endDate,duration,startTime,endTime,completionStatus FROM Course,ManagersCourses WHERE Course.courseId = ManagersCourses.courseId and managerId=? and completionStatus=? and deleteStatus=false";
         List<Course> courses = jdbcTemplate.query(query,new BeanPropertyRowMapper<Course>(Course.class),empId,completionStatus);
         if (courses.size()!=0)
         {

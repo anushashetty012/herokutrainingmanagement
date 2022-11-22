@@ -25,7 +25,7 @@ public class ManagerController
     public ResponseEntity<?> getCourse(Authentication authentication, @PathVariable String completionStatus, @RequestParam int page, @RequestParam int limit){
         String empId = authentication.getName();
         Map<Integer,List<Course>> courseList = managerService.getAssignedCoursesForManagerByStatus(empId,completionStatus,page,limit);
-        if(courseList.size() == 0){
+        if(courseList == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No "+completionStatus+" course");
         }
         return ResponseEntity.of(Optional.of(courseList));

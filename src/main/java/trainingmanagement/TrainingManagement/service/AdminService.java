@@ -130,17 +130,14 @@ public class AdminService
         }
         return null;
     }
-    public void checkManagersList( List<MultipleEmployeeRequest> courseToManager)
-    {
 
-    }
-
-    public String assignCourseToManager(int courseId, List<MultipleEmployeeRequest> courseToManager) throws ManagerNotExistException, SuperAdminIdException, EmployeeNotExistException {
+    public String assignCourseToManager(int courseId, List<MultipleEmployeeRequest> courseToManager) throws ManagerNotExistException, SuperAdminIdException, EmployeeNotExistException, CourseDeletionException {
 
         int count=0;
         int noOfManagers = courseToManager.size();
         for (int i = 0; i < noOfManagers; i++)
         {
+            isCourseExist(courseId,false);
             checkEmployeeExist(courseToManager.get(i).getEmpId());
             checkManagerExist(courseToManager.get(i).getEmpId());
             isSuperAdminId(courseToManager.get(i).getEmpId());
@@ -165,13 +162,61 @@ public class AdminService
     }
 
     //Update Existing Course
-    public int updateCourse(Course course) throws CourseInfoIntegrityException
+    public Integer updateCourse(Course course) throws CourseInfoIntegrityException{
+        String courseStatus = checkCourseStatus(course.getCourseId(),false);
+        if (courseStatus.equalsIgnoreCase("completed"))
+        {
+            throw new CourseInfoIntegrityException("course doesn't exist or it is completed");
+        }
+        if (courseStatus.equalsIgnoreCase("upcoming"))
+        {
+            courseInfoIntegrity(course);
+            return updateCourses(course);
+        }
+        course = getStartDateAndTime(course);
+        courseInfoIntegrityForUpdatingActiveCourse(course);
+        return updateCourses(course);
+    }
+
+    public void checkEndTimeExistForEndDate(Course course) throws CourseInfoIntegrityException
     {
-        courseInfoIntegrity(course);
+        if (course.getEndDate() == null && course.getEndTime() != null)
+        {
+            throw new CourseInfoIntegrityException("End date is null, you cannot enter end time");
+        }
+    }
+    public void courseInfoIntegrityForUpdatingActiveCourse(Course course) throws CourseInfoIntegrityException
+    {
+        if (course.getCourseName().isEmpty())
+        {
+            throw new CourseInfoIntegrityException("Course Name can't be empty");
+        }
+        checkEndTimeExistForEndDate(course);
+        courseModeIntegrity(course.getTrainingMode());
+        try {
+            int i=course.getStartDate().compareTo(course.getEndDate());
+            if(i>0)
+            {
+                throw new CourseInfoIntegrityException("end date cant be before start date");
+            }
+            checkEndTimeExist(course);
+            if(i==0)
+            {
+                checkTime(course);
+            }
+        }
+        catch (NullPointerException e)
+        {
+
+        }
+    }
+
+    public int updateCourses(Course course) throws CourseInfoIntegrityException {
         Timestamp startTimestamp=createTimestamp(course.getStartDate(),course.getStartTime());
         Timestamp endTimestamp=null;
         try
         {
+
             checkEndTimeExist(course);
             endTimestamp=createTimestamp(course.getEndDate(),course.getEndTime());
         } catch (CourseInfoIntegrityException e) {
@@ -179,6 +224,17 @@ public class AdminService
         }
         String query = "update Course set courseName =?, trainer=?, trainingMode=?, startDate=?, endDate =?, duration=?, startTime =?, endTime =?, meetingInfo=?,startTimestamp=?,endTimestamp=? where courseId = ? and deleteStatus=0";
         return jdbcTemplate.update(query, course.getCourseName(),course.getTrainer(),course.getTrainingMode(),course.getStartDate(),course.getEndDate(),course.getDuration(),course.getStartTime(),course.getEndTime(),course.getMeetingInfo(),startTimestamp,endTimestamp,course.getCourseId());
+    }
+    //get start date and start time from db and attach it to update request
+    public Course getStartDateAndTime(Course course)
+    {
+        String query = "select startDate,startTime from Course where courseId=?";
+        Course course1 = jdbcTemplate.queryForObject(query,(rs, rowNum) -> {
+            return new Course(rs.getDate("startDate"),rs.getTime("startTime"));
+        }, course.getCourseId());
+        course.setStartDate(course1.getStartDate());
+        course.setStartTime(course1.getStartTime());
+        return course;
     }
     public void checkStartTimeForCurrentDate(Course course) throws CourseInfoIntegrityException
     {
@@ -229,6 +285,7 @@ public class AdminService
         {
             throw new CourseInfoIntegrityException("Course Name can't be empty");
         }
+        checkEndTimeExistForEndDate(course);
         courseModeIntegrity(course.getTrainingMode());
         long millis=System.currentTimeMillis();
         java.sql.Date date=new java.sql.Date(millis);
@@ -279,8 +336,8 @@ public class AdminService
     //can't do anything if emplist contain super admin empId
     public void assignEmployeesToManager(ManagerEmployees managerEmployees) throws ManagerNotExistException, EmployeeNotExistException, ManagerEmployeeSameException, SuperAdminIdException
     {
-
         String managerId=managerEmployees.getManagerId();
+        checkEmployeeExist(managerId);
         checkManagerExist(managerId);
         isSuperAdminId(managerId);
         if (managerEmployees.getEmpId()==null || managerEmployees.getEmpId().size()==0)
@@ -295,7 +352,6 @@ public class AdminService
 
     public void updateEmployeesForManger(String empId,String managerId) throws EmployeeNotExistException, ManagerEmployeeSameException, SuperAdminIdException
     {
-
         isSuperAdminId(empId);
         checkEmployeeExist(empId);
         checkManagerIdAndEmployeeIdSame(empId,managerId);
@@ -344,18 +400,41 @@ public class AdminService
     public void  deleteCourse(int courseId) throws CourseDeletionException
     {
         isCourseExist(courseId,false);
-        String query="update course set deleteStatus=1 where courseId=?";
+        String query="update Course set deleteStatus=1 where courseId=?";
         jdbcTemplate.update(query,courseId);
     }
 
     public void isCourseExist(int courseId,boolean deleteStatus) throws CourseDeletionException
     {
-        String query="select courseId from course where courseId=? and deleteStatus=? and completionStatus='upcoming'";
+        String query="select courseId from Course where courseId=? and deleteStatus=? and completionStatus='upcoming'";
         try
         {
             jdbcTemplate.queryForObject(query, Integer.class,courseId,deleteStatus);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new CourseDeletionException("Course does not exist or course is active/completed");
+        }
+    }
+
+    public String checkCourseStatus(int courseId,boolean deleteStatus)
+    {
+        String query1="select courseId from Course where courseId=? and deleteStatus=? and completionStatus='upcoming'";
+        String query2="select courseId from Course where courseId=? and deleteStatus=? and completionStatus='active'";
+        try
+        {
+            jdbcTemplate.queryForObject(query1, Integer.class,courseId,deleteStatus);
+            return "upcoming";
+        }
+        catch (DataAccessException e) {
+
+        }
+        try
+        {
+            jdbcTemplate.queryForObject(query2, Integer.class,courseId,deleteStatus);
+            return "active";
+        }
+        catch (Exception e) {
+            return "completed";
         }
     }
 }

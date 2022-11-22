@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import trainingmanagement.TrainingManagement.customException.CourseNotValidException;
 import trainingmanagement.TrainingManagement.entity.Course;
 import trainingmanagement.TrainingManagement.request.FilterByDate;
+import trainingmanagement.TrainingManagement.response.CourseList;
 import trainingmanagement.TrainingManagement.response.EmployeeDetails;
 import trainingmanagement.TrainingManagement.response.EmployeeInvite;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
@@ -23,6 +24,7 @@ public class CommonController
 {
     @Autowired
     CommonService commonService;
+
     @GetMapping("/attendees_nonAttendees_count/{courseId}")
     @PreAuthorize("hasRole('admin') or hasRole('manager')")
     public ResponseEntity<?> getAttendeesAndNonAttendeesCount(@PathVariable int courseId,Authentication authentication)
