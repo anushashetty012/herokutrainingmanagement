@@ -311,7 +311,7 @@ public class AdminService
 
         } catch (DataAccessException e) {
 
-            throw new ManagerNotExistException("ManagerId Does Not Exist");
+            throw new ManagerNotExistException("ManagerId "+managerId+" Does Not Exist");
         }
     }
     public void checkEmployeeExist(String empId) throws EmployeeNotExistException
