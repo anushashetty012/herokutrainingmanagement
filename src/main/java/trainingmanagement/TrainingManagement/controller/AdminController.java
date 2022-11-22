@@ -167,7 +167,7 @@ public class AdminController
         return ResponseEntity.status(HttpStatus.OK).body("Updated successfully");
     }
 
-    @PostMapping("/assignManager/employees")
+    @PutMapping("/assignManager/employees")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> assignManager(@RequestBody ManagerEmployees managerEmployees)
     {

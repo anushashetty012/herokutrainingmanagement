@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import trainingmanagement.TrainingManagement.customException.CourseNotValidException;
+import trainingmanagement.TrainingManagement.customException.EmployeeNotExistException;
 import trainingmanagement.TrainingManagement.customException.EmployeeNotUnderManagerException;
 import trainingmanagement.TrainingManagement.entity.Course;
 import trainingmanagement.TrainingManagement.entity.Employee;
@@ -341,15 +342,30 @@ public class CommonService
 
     }
 
-    public String inviteEmployees(int courseId,List<MultipleEmployeeRequest> inviteToEmployees, String empId) throws CourseNotValidException, EmployeeNotUnderManagerException {
+    public void checkEmployeeExist(String empId) throws EmployeeNotExistException
+    {
+        String query="select emp_id from employee where emp_id=? and delete_status=0 ";
         try
         {
-            isCourseIdValid(courseId);
+            String str=jdbcTemplate.queryForObject(query,String.class,empId);
+
+        } catch (DataAccessException e) {
+
+            throw new EmployeeNotExistException("Employee "+empId+" Does Not Exist");
         }
-        catch (CourseNotValidException e)
+    }
+
+    public void checkEmployeesExist(List<MultipleEmployeeRequest> inviteToEmployees) throws EmployeeNotExistException {
+        for (MultipleEmployeeRequest emp:inviteToEmployees)
         {
-            return e.getMessage();
+            checkEmployeeExist(emp.getEmpId());
         }
+    }
+
+    public String inviteEmployees(int courseId,List<MultipleEmployeeRequest> inviteToEmployees, String empId) throws CourseNotValidException, EmployeeNotUnderManagerException, EmployeeNotExistException
+    {
+        isCourseIdValid(courseId);
+        checkEmployeesExist(inviteToEmployees);
         int noOfInvites = inviteToEmployees.size();
         int count = 0;
         if(getRole((empId)).equalsIgnoreCase("admin"))
