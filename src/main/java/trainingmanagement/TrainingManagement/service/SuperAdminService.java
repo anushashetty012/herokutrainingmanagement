@@ -87,13 +87,20 @@ public class SuperAdminService {
         }
     }
 
-
-
     public String changeRole(EmployeeRole employeeRole) throws EmployeeNotExistException, SuperAdminIdException, EmployeeExistException {
         isSuperAdminId(employeeRole.getEmpId());
         employeeExist(employeeRole.getEmpId());
         checkEmployeeDeleted(employeeRole.getEmpId());
         jdbcTemplate.update(CHANGING_ROLES,employeeRole.getRoleName(),employeeRole.getEmpId());
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("spring.email.from@gmail.com");
+        String query = "select email from employee where emp_id=?";
+        String email = jdbcTemplate.queryForObject(query, String.class,employeeRole.getEmpId());
+        message.setTo(email);
+        String emailText ="Your role is changed to "+employeeRole.getRoleName();
+        message.setText(emailText);
+        message.setSubject("Role changed");
+        mailSender.send(message);
         return "Role changed to "+employeeRole.getRoleName();
     }
 
