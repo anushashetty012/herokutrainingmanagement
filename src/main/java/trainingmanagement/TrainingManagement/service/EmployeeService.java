@@ -285,7 +285,7 @@ public class EmployeeService
     //Get Count of Courses that employee has accepted the request based on completion status
     public int getCourseStatusCountForEmployee(String empId, String completionStatus)
     {
-        String query = "select count(AcceptedInvites.courseId) from AcceptedInvites, Course where AcceptedInvites.courseId = Course.courseId and Course.completionStatus = ? and empId = ? ";
+        String query = "select count(AcceptedInvites.courseId) from AcceptedInvites, Course where AcceptedInvites.courseId = Course.courseId and Course.completionStatus = ? and empId = ? and Course.deleteStatus=false and AcceptedInvites.deleteStatus = false";
         return jdbcTemplate.queryForObject(query, Integer.class,completionStatus,empId);
     }
 
