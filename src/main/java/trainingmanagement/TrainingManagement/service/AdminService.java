@@ -299,14 +299,9 @@ public class AdminService
         long millis=System.currentTimeMillis();
         java.sql.Date date=new java.sql.Date(millis);
         String str= date.toString();
-
-
         LocalDate currentDate = Date.valueOf(str).toLocalDate();
         LocalDate startDate = course.getStartDate().toLocalDate();
-
-
         int startToCurrentDateStatus = currentDate.compareTo(startDate);
-
         if(0 < startToCurrentDateStatus)
         {
             throw new CourseInfoIntegrityException("start date can't be before  current date");
@@ -316,7 +311,6 @@ public class AdminService
             checkStartTimeExist(course);
             checkStartTimeForCurrentDate(course);
         }
-
         try {
             int i=course.getStartDate().compareTo(course.getEndDate());
             if(i>0)

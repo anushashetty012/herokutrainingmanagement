@@ -367,7 +367,57 @@ public class CommonService
             checkEmployeeExist(emp.getEmpId());
         }
     }
+    public String inviteEmployeesByAdmin(int courseId,List<MultipleEmployeeRequest> inviteToEmployees, String empId,int noOfInvites,int count)
+    {
+        for (int i=0; i<noOfInvites; i++)
+        {
+            //already invited
+            List<Employee> isInvited = jdbcTemplate.query("SELECT emp_id FROM employee,Invites WHERE employee.emp_id=? and employee.emp_id<>'RT001' and employee.emp_id=Invites.empId and courseId=? and (acceptanceStatus=true or acceptanceStatus is null)", (rs, rowNum) -> {
+                return new Employee(rs.getString("emp_Id"));
+            }, inviteToEmployees.get(i).getEmpId(), courseId);
+            if (isInvited.size() == 0)
+            {
+                count++;
+                jdbcTemplate.update(INVITE_EMPLOYEES, new Object[]{inviteToEmployees.get(i).getEmpId(), courseId});
+            }
+        }
+        if (count == 0)
+        {
+            return "They are already invited for this course";
+        }
+        return "Invited successfully";
+    }
 
+    public String inviteEmployeesByManager(int courseId,List<MultipleEmployeeRequest> inviteToEmployees, String empId,int noOfInvites,int count) throws EmployeeNotUnderManagerException
+    {
+        checkEmployeeUnderManager(inviteToEmployees,empId);
+        List<ManagersCourses> isCourseAssigned = jdbcTemplate.query(CHECK_COURSE_ALLOCATION, (rs, rowNum) -> {
+            return new ManagersCourses(rs.getInt("courseId"));
+        }, empId, courseId);
+        if (isCourseAssigned.size() != 0)
+        {
+            for (int i=0; i<noOfInvites; i++)
+            {
+                List<Employee> isInvited = jdbcTemplate.query("SELECT emp_id FROM employee,Invites WHERE employee.emp_id=? and employee.emp_id<>'RT001' and employee.emp_id=Invites.empId and courseId=? and (acceptanceStatus=true or acceptanceStatus is null)", (rs, rowNum) -> {
+                    return new Employee(rs.getString("emp_Id"));
+                }, inviteToEmployees.get(i).getEmpId(), courseId);
+                if (isInvited.size() == 0)
+                {
+                    count++;
+                    jdbcTemplate.update(INVITE_EMPLOYEES,new Object[]{inviteToEmployees.get(i).getEmpId(),courseId});
+                }
+            }
+            if (count == 0)
+            {
+                return "They are already invited for this course";
+            }
+        }
+        else
+        {
+            return "You cannot assign employees for this course";
+        }
+        return "Invited successfully";
+    }
     public String inviteEmployees(int courseId,List<MultipleEmployeeRequest> inviteToEmployees, String empId) throws CourseNotValidException, EmployeeNotUnderManagerException, EmployeeNotExistException
     {
         isCourseIdValid(courseId);
@@ -376,51 +426,11 @@ public class CommonService
         int count = 0;
         if(getRole((empId)).equalsIgnoreCase("admin"))
         {
-            for (int i=0; i<noOfInvites; i++)
-            {
-                //already invited
-                List<Employee> isInvited = jdbcTemplate.query("SELECT emp_id FROM employee,Invites WHERE employee.emp_id=? and employee.emp_id<>'RT001' and employee.emp_id=Invites.empId and courseId=? and (acceptanceStatus=true or acceptanceStatus is null)", (rs, rowNum) -> {
-                    return new Employee(rs.getString("emp_Id"));
-                }, inviteToEmployees.get(i).getEmpId(), courseId);
-                if (isInvited.size() == 0)
-                {
-                    count++;
-                    jdbcTemplate.update(INVITE_EMPLOYEES, new Object[]{inviteToEmployees.get(i).getEmpId(), courseId,});
-                }
-            }
-            if (count == 0)
-            {
-                return "They are already invited for this course";
-            }
+            return inviteEmployeesByAdmin(courseId,inviteToEmployees,empId,noOfInvites,count);
         }
         if (getRole((empId)).equalsIgnoreCase("manager"))
         {
-            checkEmployeeUnderManager(inviteToEmployees,empId);
-            List<ManagersCourses> isCourseAssigned = jdbcTemplate.query(CHECK_COURSE_ALLOCATION, (rs, rowNum) -> {
-                return new ManagersCourses(rs.getInt("courseId"));
-            }, empId, courseId);
-            if (isCourseAssigned.size() != 0)
-            {
-                for (int i=0; i<noOfInvites; i++)
-                {
-                    List<Employee> isInvited = jdbcTemplate.query("SELECT emp_id FROM employee,Invites WHERE employee.emp_id=? and employee.emp_id<>'RT001' and employee.emp_id=Invites.empId and courseId=? and (acceptanceStatus=true or acceptanceStatus is null)", (rs, rowNum) -> {
-                        return new Employee(rs.getString("emp_Id"));
-                    }, inviteToEmployees.get(i).getEmpId(), courseId);
-                    if (isInvited.size() == 0)
-                    {
-                        count++;
-                        jdbcTemplate.update(INVITE_EMPLOYEES,new Object[]{inviteToEmployees.get(i).getEmpId(),courseId});
-                    }
-                }
-                if (count == 0)
-                {
-                    return "They are already invited for this course";
-                }
-            }
-            else
-            {
-                return "You cannot assign employees for this course";
-            }
+           return inviteEmployeesByManager(courseId,inviteToEmployees,empId,noOfInvites,count);
         }
         return "Invited successfully";
     }
