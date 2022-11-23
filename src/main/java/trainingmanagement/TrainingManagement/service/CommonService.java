@@ -434,10 +434,23 @@ public class CommonService
             }
         }
     }
+    public void checkCourseStatus(int courseId) throws Exception {
+        String query = "select courseId from Course where courseId=? and completionStatus='upcoming' and deleteStatus=0";
+        try
+        {
+            jdbcTemplate.queryForObject(query, Integer.class,courseId);
+        }
+        catch (DataAccessException e)
+        {
+            throw new Exception("Cannot delete invite because course is active/completed");
+        }
+    }
 
     //to delete invite
     public String deleteInvite(int courseId, List<MultipleEmployeeRequest> deleteInvites,String empId) throws Exception
     {
+        checkCourseStatus(courseId);
+        checkEmployeesExist(deleteInvites);
         isInviteListValid(courseId, deleteInvites);
         int noOfInvites = deleteInvites.size();
         if(getRole((empId)).equalsIgnoreCase("admin"))
