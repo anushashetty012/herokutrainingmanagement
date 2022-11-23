@@ -73,7 +73,7 @@ public class CommonService
         }
         catch (DataAccessException e)
         {
-            return "No such courseId exist";
+            return null;
         }
     }
 
@@ -99,7 +99,7 @@ public class CommonService
         }
         catch (DataAccessException e)
         {
-            return "No such courseId exist";
+            return null;
         }
         return null;
     }
