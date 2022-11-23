@@ -28,16 +28,19 @@ public class JwtController {
     private JdbcTemplate jdbcTemplate;
 
     @PostMapping({"/authenticate"})
-    public ResponseEntity<?> createJwtToken(@RequestBody JwtRequest jwtRequest) throws Exception {
+    public ResponseEntity<?> createJwtToken(@RequestBody JwtRequest jwtRequest) throws Exception
+    {
         try
         {
             checkEmployeeExist(jwtRequest.getEmpId());
         }
-        catch (EmployeeNotExistException e) {
+        catch (EmployeeNotExistException e)
+        {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not allowed to use this service");
         }
         return ResponseEntity.of(Optional.of(jwtService.createJwtToken(jwtRequest)));
     }
+
     public void checkEmployeeExist(String empId) throws EmployeeNotExistException
     {
         String query="select emp_id from employee where emp_id=? and delete_status=0 ";
@@ -45,8 +48,9 @@ public class JwtController {
         {
             String str=jdbcTemplate.queryForObject(query,String.class,empId);
 
-        } catch (DataAccessException e) {
-
+        }
+        catch (DataAccessException e)
+        {
             throw new EmployeeNotExistException("Employee "+empId+" Does Not Exist");
         }
     }

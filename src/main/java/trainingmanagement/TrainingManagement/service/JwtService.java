@@ -32,7 +32,8 @@ public class JwtService implements UserDetailsService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public JwtResponse createJwtToken(JwtRequest jwtRequest)throws Exception{
+    public JwtResponse createJwtToken(JwtRequest jwtRequest)throws Exception
+    {
         String empId= jwtRequest.getEmpId();
         String password= jwtRequest.getPassword();
         authenticate(empId, password);
@@ -42,39 +43,48 @@ public class JwtService implements UserDetailsService {
 
         Employee employee = employeeDao.findById(empId).get();
         return new JwtResponse(employee, newGeneratedToken);
-
     }
 
     @Override
-    public UserDetails loadUserByUsername(String empId) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String empId) throws UsernameNotFoundException
+    {
         Employee employee = employeeDao.findById(empId).get();
 
-        if(employee != null){
+        if(employee != null)
+        {
             return new org.springframework.security.core.userdetails.User(
                  employee.getEmpId(),
                  employee.getPassword(),
                  getAuthority(employee)
             );
-        }else{
+        }
+        else
+        {
             throw new UsernameNotFoundException("User not found with username "+empId);
         }
     }
 
-    private Set getAuthority(Employee employee){
+    private Set getAuthority(Employee employee)
+    {
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
         employee.getRoles().forEach(roles -> {
             authorities.add(new SimpleGrantedAuthority("ROLE_" + roles.getRoleName()));
                 });
         return authorities;
-
     }
 
-    private void authenticate(String empId, String password) throws Exception {
-        try {
+    private void authenticate(String empId, String password) throws Exception
+    {
+        try
+        {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(empId, password));
-        } catch (DisabledException e) {
+        }
+        catch (DisabledException e)
+        {
             throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
+        }
+        catch (BadCredentialsException e)
+        {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
     }

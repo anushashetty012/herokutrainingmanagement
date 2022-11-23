@@ -112,7 +112,8 @@ public class EmployeeController
     public ResponseEntity<?> filterCourses(Authentication authentication, @ModelAttribute FilterByDate filter, @RequestParam int page, @RequestParam int limit){
         String empId = authentication.getName();
         Map<Integer,List<Course>> courseList = employeeService.filterCourse(filter,empId,page,limit);
-        if(courseList == null){
+        if(courseList == null)
+        {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No "+filter.getCompletionStatus()+" course between the range");
         }
         return ResponseEntity.of(Optional.of(courseList));
@@ -132,7 +133,8 @@ public class EmployeeController
     public ResponseEntity<?> filterCoursesByStatus(Authentication authentication, @PathVariable String completionStatus,@RequestParam int page,@RequestParam int limit){
         String empId = authentication.getName();
         Map<Integer,List<Course>> courseList = employeeService.coursesForEmployeeByCompletedStatus(empId,completionStatus,page,limit);
-        if(courseList == null){
+        if(courseList == null)
+        {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No "+ completionStatus+" course");
         }
         return ResponseEntity.of(Optional.of(courseList));

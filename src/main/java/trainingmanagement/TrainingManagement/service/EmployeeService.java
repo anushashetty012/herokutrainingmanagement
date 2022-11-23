@@ -35,6 +35,7 @@ public class EmployeeService
     {
         return jdbcTemplate.queryForObject(GET_ROLE,new Object[]{empId},String.class);
     }
+
     public int getAcceptedCount(int courseId,String empId)
     {
         if(getRole((empId)).equalsIgnoreCase("admin"))
@@ -67,6 +68,7 @@ public class EmployeeService
         }
         return 0;
     }
+
     public CourseInfo viewCourseDetails(int courseId, String empId)
     {
         if(getRole((empId)).equalsIgnoreCase("admin"))
@@ -119,6 +121,7 @@ public class EmployeeService
         }
         return null;
     }
+
     public void isInviteValid(int inviteId) throws Exception
     {
         String query1 = "select courseId from Invites where inviteId=? and acceptanceStatus is null";
@@ -148,6 +151,7 @@ public class EmployeeService
         }
         return "Accepted invite successfully";
     }
+
     public String rejectInvite(int inviteId, RejectedResponse reason)
     {
         try
@@ -165,6 +169,7 @@ public class EmployeeService
         }
         return "Rejected invite successfully";
     }
+
     //attended and non attended course
     //profile info
     public EmployeeProfile profileInfo(String empId)
@@ -180,6 +185,7 @@ public class EmployeeService
             return null;
         }
     }
+
     //attended course
     public Map<Integer,List<AttendedCourse>> attendedCourse(String empId,int page, int limit)
     {
@@ -288,7 +294,8 @@ public class EmployeeService
         String query = "select count(empId) from Invites where empId=? and notificationSentStatus=0 and acceptanceStatus is null";
         try {
             return jdbcTemplate.queryForObject(query, Integer.class, empId);
-        } catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             return 0;
         }
     }

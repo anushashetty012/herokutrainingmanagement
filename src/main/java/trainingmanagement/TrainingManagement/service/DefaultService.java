@@ -65,6 +65,7 @@ public class DefaultService
         superAdmin.setRoles(superAdminRoles);
         employeeDao.save(superAdmin);
     }
+
     public String getEncodedPassword(String password)
     {
         return passwordEncoder.encode(password);

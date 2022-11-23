@@ -70,7 +70,9 @@ public class CommonController
         try
         {
             employeeList = commonService.getEmployeesToInvite(courseId,authentication.getName());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         if (employeeList == null)
@@ -87,7 +89,9 @@ public class CommonController
         try
         {
             inviteStatus = commonService.inviteEmployees(courseId,inviteToEmployees,authentication.getName());
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         if (inviteStatus == null)
@@ -110,7 +114,6 @@ public class CommonController
         {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
         if (deleteStatus == null)
         {
             return new ResponseEntity<>("You cannot delete invite of this employees for this course",HttpStatus.NOT_FOUND);
@@ -144,6 +147,7 @@ public class CommonController
         }
         return ResponseEntity.of(Optional.of(empData));
     }
+
     @GetMapping("/course/filter")
     @PreAuthorize("hasRole('admin') or hasRole('manager')")
     public ResponseEntity<?> filterCourse(Authentication authentication, @ModelAttribute FilterByDate filter,@RequestParam int page, @RequestParam int limit){

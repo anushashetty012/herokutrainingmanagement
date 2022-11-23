@@ -22,10 +22,12 @@ public class ManagerController
     //Get List of courses assigned to manager based on the completion status
     @GetMapping("/assignedCourses/{completionStatus}")
     @PreAuthorize("hasRole('manager')")
-    public ResponseEntity<?> getCourse(Authentication authentication, @PathVariable String completionStatus, @RequestParam int page, @RequestParam int limit){
+    public ResponseEntity<?> getCourse(Authentication authentication, @PathVariable String completionStatus, @RequestParam int page, @RequestParam int limit)
+    {
         String empId = authentication.getName();
         Map<Integer,List<Course>> courseList = managerService.getAssignedCoursesForManagerByStatus(empId,completionStatus,page,limit);
-        if(courseList == null){
+        if(courseList == null)
+        {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No "+completionStatus+" course");
         }
         return ResponseEntity.of(Optional.of(courseList));

@@ -71,6 +71,7 @@ public class AdminController
         }
         return ResponseEntity.of(Optional.of(courses));
     }
+
     //create course
     @PostMapping("/createCourse")
     @PreAuthorize("hasRole('admin')")
@@ -141,10 +142,11 @@ public class AdminController
         try
         {
             assignStatus = adminRepository.assignCourseToManager(courseId,courseToManager);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
         if ( assignStatus == null )
         {
             return new ResponseEntity<>("This course is already allocated to this manager",HttpStatus.INTERNAL_SERVER_ERROR);
@@ -156,12 +158,16 @@ public class AdminController
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<?> updateCourse(@RequestBody Course course){
         int updatedCourse = 0;
-        try {
+        try
+        {
             updatedCourse = adminRepository.updateCourse(course);
-        } catch (CourseInfoIntegrityException e) {
+        }
+        catch (CourseInfoIntegrityException e)
+        {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if(updatedCourse == 0){
+        if(updatedCourse == 0)
+        {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update the course");
         }
         return ResponseEntity.status(HttpStatus.OK).body("Updated successfully");
@@ -184,10 +190,13 @@ public class AdminController
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> deleteEmployees(@PathVariable Integer courseId)
     {
-        try {
+        try
+        {
             adminRepository.deleteCourse(courseId);
             return ResponseEntity.status(HttpStatus.OK).body("Deleted course successfully");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }

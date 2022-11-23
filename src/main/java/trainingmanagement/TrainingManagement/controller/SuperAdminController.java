@@ -41,9 +41,12 @@ public class SuperAdminController
     @PreAuthorize("hasRole('super_admin')")
     public ResponseEntity<String> changingRole(@RequestBody EmployeeRole employeeRole) throws EmployeeNotExistException {
         String roleStatus = null;
-        try{
+        try
+        {
             roleStatus = superAdminService.changeRole(employeeRole);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
         return ResponseEntity.of(Optional.of( roleStatus));
@@ -57,7 +60,6 @@ public class SuperAdminController
         {
             superAdminService.deleteEmployees(employees);
             return ResponseEntity.status(HttpStatus.OK).body("Deleted successfully");
-
         }
         catch (Exception e)
         {
