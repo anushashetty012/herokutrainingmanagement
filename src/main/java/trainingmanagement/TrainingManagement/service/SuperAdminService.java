@@ -48,7 +48,6 @@ public class SuperAdminService
     {
         checkEmployeeExist(employee.getEmpId());
         isSuperAdminId(employee.getEmpId());
-        //checkEmployeeDeleted(employee.getEmpId());
         Roles roles = roleDao.findById("employee").get();
         Set<Roles> employeeRoles = new HashSet<>();
 
