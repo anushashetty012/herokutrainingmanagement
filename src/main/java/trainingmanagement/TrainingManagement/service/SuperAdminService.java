@@ -44,7 +44,7 @@ public class SuperAdminService
     private String CHANGING_ROLES = "UPDATE employee_role SET role_name=? WHERE emp_id=?";
     int offset=0;
 
-    public void registerNewEmployee(Employee employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException
+    public void registerEmployee(Employee employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException
     {
         checkEmployeeExist(employee.getEmpId());
         isSuperAdminId(employee.getEmpId());
@@ -65,6 +65,13 @@ public class SuperAdminService
         String query =  "insert into Manager(empId) values(?)";
         employeeDao.save(employee);
         jdbcTemplate.update(query,employee.getEmpId());
+    }
+    public void registerNewEmployee(List<Employee> employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException
+    {
+        for (Employee emp:employee)
+        {
+            registerEmployee(emp);
+        }
     }
     public void checkEmployeeExist(String empId) throws EmployeeExistException
     {

@@ -24,7 +24,7 @@ public class SuperAdminController
 
     @PostMapping("/registerEmployees")
     @PreAuthorize("hasRole('super_admin')")
-    public ResponseEntity<String> registerEmployees(@RequestBody Employee employee)
+    public ResponseEntity<String> registerEmployees(@RequestBody List<Employee> employee)
     {
         try
         {
