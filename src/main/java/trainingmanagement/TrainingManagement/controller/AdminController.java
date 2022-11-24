@@ -24,41 +24,18 @@ public class AdminController
     @Autowired
     AdminService adminRepository;
 
-    @GetMapping("/company/activeTrainings/count")
+    @GetMapping("/company/trainings/count/{completionStatus}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<?> activeCourseCount()
+    public ResponseEntity<?> trainingCountByStatus(@PathVariable String completionStatus)
     {
-        int count = adminRepository.activeCourse();
+        int count = adminRepository.getCourseCountByStatus(completionStatus);
         if (count == 0)
         {
-            return new ResponseEntity<>("No active course in the company",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.of(Optional.of(count));
     }
 
-    @GetMapping("/company/upcomingTrainings/count")
-    @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<?> upcomingCourseCount()
-    {
-        int count = adminRepository.upcomingCourse();
-        if (count == 0)
-        {
-            return new ResponseEntity<>("No upcoming course in the company",HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.of(Optional.of(count));
-    }
-
-    @GetMapping("/company/completedTrainings/count")
-    @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<?> completedCourseCount()
-    {
-        int count = adminRepository.completedCourse();
-        if (count == 0)
-        {
-            return new ResponseEntity<>("No completed course in the company",HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.of(Optional.of(count));
-    }
     //get the list of course based on completion status
     @GetMapping("/company/courses/{completionStatus}")
     @PreAuthorize("hasRole('admin')")

@@ -35,19 +35,9 @@ public class AdminService
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    public int activeCourse()
+    public int getCourseCountByStatus(String status)
     {
-        return jdbcTemplate.queryForObject(TRAINING_COUNT, new Object[]{"active"}, Integer.class);
-    }
-
-    public int upcomingCourse()
-    {
-        return jdbcTemplate.queryForObject(TRAINING_COUNT, new Object[]{"upcoming"}, Integer.class);
-    }
-
-    public int completedCourse()
-    {
-        return jdbcTemplate.queryForObject(TRAINING_COUNT, new Object[]{"completed"}, Integer.class);
+        return jdbcTemplate.queryForObject(TRAINING_COUNT, new Object[]{status}, Integer.class);
     }
 
     public Map<Integer,List<CourseList>> getCourse(String completionStatus, int page, int limit)
