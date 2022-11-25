@@ -351,9 +351,8 @@ public class EmployeeService
         }
         catch (Exception e)
         {
-            System.out.println(e.getMessage());
+            return null;
         }
-        return null;
     }
 
     public String viewProfilePhoto(String empId)

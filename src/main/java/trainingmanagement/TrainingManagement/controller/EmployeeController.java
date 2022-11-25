@@ -161,6 +161,10 @@ public class EmployeeController
     public ResponseEntity<?> uploadIProfile(@RequestParam("file") MultipartFile file, Authentication authentication)
     {
         String uploadMessage = employeeService.uploadProfilePhoto(file,authentication.getName());
+        if (uploadMessage == null)
+        {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload profile photo");
+        }
         return ResponseEntity.status(HttpStatus.OK).body(uploadMessage);
     }
 
