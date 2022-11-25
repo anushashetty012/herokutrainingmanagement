@@ -181,7 +181,7 @@ public class AdminService
     }
     public void courseInfoIntegrityForUpdatingActiveCourse(Course course) throws CourseInfoIntegrityException
     {
-        if (course.getCourseName().isEmpty())
+        if (course.getCourseName().trim().isEmpty())
         {
             throw new CourseInfoIntegrityException("Course Name can't be empty");
         }
@@ -280,7 +280,7 @@ public class AdminService
 
     public void courseInfoIntegrity(Course course) throws CourseInfoIntegrityException
     {
-        if (course.getCourseName().isEmpty())
+        if (course.getCourseName().trim().isEmpty())
         {
             throw new CourseInfoIntegrityException("Course Name can't be empty");
         }
