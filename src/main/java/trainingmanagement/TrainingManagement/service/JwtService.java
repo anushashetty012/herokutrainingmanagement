@@ -32,17 +32,23 @@ public class JwtService implements UserDetailsService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public JwtResponse createJwtToken(JwtRequest jwtRequest)throws Exception
+    public JwtResponse createJwtToken(JwtRequest jwtRequest) throws Exception
     {
-        String empId= jwtRequest.getEmpId();
-        String password= jwtRequest.getPassword();
-        authenticate(empId, password);
+        try
+        {
+            String empId= jwtRequest.getEmpId();
+            String password= jwtRequest.getPassword();
+            authenticate(empId, password);
 
-        UserDetails userDetails = loadUserByUsername(empId);
-        String newGeneratedToken = jwtUtil.generateToken(userDetails);
+            UserDetails userDetails = loadUserByUsername(empId);
+            String newGeneratedToken = jwtUtil.generateToken(userDetails);
 
-        Employee employee = employeeDao.findById(empId).get();
-        return new JwtResponse(employee, newGeneratedToken);
+            Employee employee = employeeDao.findById(empId).get();
+            return new JwtResponse(employee, newGeneratedToken);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

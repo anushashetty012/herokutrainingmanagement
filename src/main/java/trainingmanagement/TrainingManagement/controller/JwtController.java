@@ -30,15 +30,21 @@ public class JwtController {
     @PostMapping({"/authenticate"})
     public ResponseEntity<?> createJwtToken(@RequestBody JwtRequest jwtRequest) throws Exception
     {
+        JwtResponse response;
         try
         {
             checkEmployeeExist(jwtRequest.getEmpId());
+            response  = jwtService.createJwtToken(jwtRequest);
         }
         catch (EmployeeNotExistException e)
         {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not allowed to use this service");
         }
-        return ResponseEntity.of(Optional.of(jwtService.createJwtToken(jwtRequest)));
+        if (response == null)
+        {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+        return ResponseEntity.of(Optional.of(response));
     }
 
     public void checkEmployeeExist(String empId) throws EmployeeNotExistException
