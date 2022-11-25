@@ -49,6 +49,7 @@ public class SuperAdminService
     public void registerEmployee(Employee employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException, InvalidEmployeeDetailsException {
         isEmployeeDetailValid(employee);
         checkEmployeeExist(employee.getEmpId());
+        checkEmailExist(employee.getEmail());
         isSuperAdminId(employee.getEmpId());
         Roles roles = roleDao.findById("employee").get();
         Set<Roles> employeeRoles = new HashSet<>();
@@ -67,6 +68,15 @@ public class SuperAdminService
         String query =  "insert into Manager(empId) values(?)";
         employeeDao.save(employee);
         jdbcTemplate.update(query,employee.getEmpId());
+    }
+    public void checkEmailExist( String email) throws InvalidEmployeeDetailsException
+    {
+        String query="select count(email) from employee where email=?";
+        int i = jdbcTemplate.queryForObject(query, Integer.class,email);
+        if(i >= 1)
+        {
+            throw new InvalidEmployeeDetailsException("Email already exists, register with different email");
+        }
     }
     public void isEmployeeDetailValid(Employee employee) throws InvalidEmployeeDetailsException
     {
