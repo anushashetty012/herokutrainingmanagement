@@ -70,8 +70,7 @@ public class SuperAdminService
     }
     public void isEmployeeDetailValid(Employee employee) throws InvalidEmployeeDetailsException
     {
-        String empId = employee.getEmpId().trim();
-        if (empId.isEmpty())
+        if ((employee.getEmpId().trim()).isEmpty())
         {
             throw new InvalidEmployeeDetailsException("Employee id cannot be null");
         }
