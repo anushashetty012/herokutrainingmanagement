@@ -18,8 +18,6 @@ public class JwtUtil {
 
     private static final int TOKEN_VALIDITY = 12*60*60;
 
-    //private static final long REFRESH_TOKEN_VALIDITY = 10000 * 10;
-
     public String getUsernameFromToken(String token){
         return getClaimFromToken(token, Claims::getSubject);
     }
@@ -59,22 +57,4 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
-
-
-
-    //Refresh Token
-//    public String generateRefreshToken(UserDetails userDetails) {
-//
-//        Map<String, Object> claims = new HashMap<>();
-//
-//        return Jwts.builder()
-//                .setClaims(claims)
-//                .setSubject(userDetails.getUsername())
-//                .setIssuedAt(new Date(System.currentTimeMillis()))
-//                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY * 1000))
-//                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-//                .compact();
-//    }
-
-
 }
