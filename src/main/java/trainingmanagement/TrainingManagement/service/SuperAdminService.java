@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import trainingmanagement.TrainingManagement.customException.EmployeeExistException;
 import trainingmanagement.TrainingManagement.customException.EmployeeNotExistException;
+import trainingmanagement.TrainingManagement.customException.InvalidEmployeeDetailsException;
 import trainingmanagement.TrainingManagement.customException.SuperAdminIdException;
 import trainingmanagement.TrainingManagement.dao.EmployeeDao;
 import trainingmanagement.TrainingManagement.dao.RoleDao;
@@ -21,6 +22,7 @@ import trainingmanagement.TrainingManagement.response.EmployeeDetails;
 import trainingmanagement.TrainingManagement.response.EmployeeProfile;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 public class SuperAdminService
@@ -44,8 +46,8 @@ public class SuperAdminService
     private String CHANGING_ROLES = "UPDATE employee_role SET role_name=? WHERE emp_id=?";
     int offset=0;
 
-    public void registerEmployee(Employee employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException
-    {
+    public void registerEmployee(Employee employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException, InvalidEmployeeDetailsException {
+        isEmployeeDetailValid(employee);
         checkEmployeeExist(employee.getEmpId());
         isSuperAdminId(employee.getEmpId());
         Roles roles = roleDao.findById("employee").get();
@@ -66,8 +68,32 @@ public class SuperAdminService
         employeeDao.save(employee);
         jdbcTemplate.update(query,employee.getEmpId());
     }
-    public void registerNewEmployee(List<Employee> employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException
+    public void isEmployeeDetailValid(Employee employee) throws InvalidEmployeeDetailsException
     {
+        String empId = employee.getEmpId().trim();
+        if (empId.isEmpty())
+        {
+            throw new InvalidEmployeeDetailsException("Employee id cannot be null");
+        }
+        if ((employee.getEmpName().trim()).isEmpty())
+        {
+            throw new InvalidEmployeeDetailsException("Employee name cannot be null");
+        }
+        if ((employee.getPassword().trim()).isEmpty())
+        {
+            throw new InvalidEmployeeDetailsException("Employee password cannot be null");
+        }
+        if ((employee.getDesignation().trim()).isEmpty())
+        {
+            throw new InvalidEmployeeDetailsException("Employee designation cannot be null");
+        }
+        if ((employee.getEmail().trim()).isEmpty())
+        {
+            throw new InvalidEmployeeDetailsException("Employee email id cannot be null");
+        }
+    }
+
+    public void registerNewEmployee(List<Employee> employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException, InvalidEmployeeDetailsException {
         for (Employee emp:employee)
         {
             registerEmployee(emp);
