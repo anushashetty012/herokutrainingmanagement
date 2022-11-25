@@ -135,9 +135,9 @@ public class CommonController
         return ResponseEntity.of(Optional.of(empData));
     }
 
-    @GetMapping("/employees/{searchKey}")
+    @GetMapping("/employees/search")
     @PreAuthorize("hasRole('admin') or hasRole('manager')")
-    public ResponseEntity<?> getEmployeeListBySearchKey(Authentication authentication, @PathVariable String searchKey,@RequestParam int page, @RequestParam int limit)
+    public ResponseEntity<?> getEmployeeListBySearchKey(Authentication authentication, @RequestParam String searchKey,@RequestParam int page, @RequestParam int limit)
     {
         String empId = authentication.getName();
         Map<Integer,List<EmployeeDetails>> empData = commonService.employeeDetailsBySearchKey(empId,searchKey,page,limit);

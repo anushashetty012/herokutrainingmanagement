@@ -98,9 +98,9 @@ public class AdminController
     }
 
     //search managers by search key
-    @GetMapping("/managersBySearchKey/{searchKey}")
+    @GetMapping("/managersBySearchKey")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<?> getManagersBySearchKey(@RequestParam int page, @RequestParam int limit,@PathVariable String searchKey)
+    public ResponseEntity<?> getManagersBySearchKey(@RequestParam int page, @RequestParam int limit,@RequestParam String searchKey)
     {
         Map<Integer,List<EmployeeInfo>> managers = adminRepository.getManagersBySearchkey(page,limit,searchKey);
         if (managers == null)
