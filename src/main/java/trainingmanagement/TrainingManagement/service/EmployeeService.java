@@ -340,11 +340,11 @@ public class EmployeeService
             // Upload the image
             Map params1 = ObjectUtils.asMap(
                     "use_filename", true,
-                    "unique_filename", false,
-                    "overwrite", true
+                    "unique_filename", true,
+                    "overwrite", false,
+                    "folder","trainingmanagement"
             );
             Map uploadResult = cloudinary.uploader().upload(profilePhoto.getBytes(), params1);
-            //String publicId = uploadResult.get("public_id").toString();
             String url = uploadResult.get("secure_url").toString();
             jdbcTemplate.update("update employee set profile_pic=? where emp_id=?",url,empId);
             return "Profile photo uploaded successfully";
