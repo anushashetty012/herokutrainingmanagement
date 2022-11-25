@@ -7,4 +7,5 @@ public class PasswordResponse
 {
     private String empId;
     private String password;
+    private String otpCode;
 }

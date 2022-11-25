@@ -85,9 +85,14 @@ public class EmailOtpService
     //Change Password
     public int changePassword(PasswordResponse passwordResponse)
     {
-        String query =  "UPDATE employee SET password = ? WHERE emp_id = ? and delete_status=false";
-        return jdbcTemplate.update(query,getEncodedPassword(passwordResponse.getPassword()),passwordResponse.getEmpId());
-
+        int validateCode = jdbcTemplate.queryForObject("select count(*) from EmployeeOtp WHERE 2fa_code=? and empId=?", Integer.class,passwordResponse.getOtpCode(),passwordResponse.getEmpId());
+        if(validateCode==1)
+        {
+            jdbcTemplate.update("delete from EmployeeOtp WHERE empId=?",passwordResponse.getEmpId());
+            String query =  "UPDATE employee SET password = ? WHERE emp_id = ? and delete_status=false";
+            return jdbcTemplate.update(query,getEncodedPassword(passwordResponse.getPassword()),passwordResponse.getEmpId());
+        }
+        return 0;
     }
 
     public String getEncodedPassword(String password) {
