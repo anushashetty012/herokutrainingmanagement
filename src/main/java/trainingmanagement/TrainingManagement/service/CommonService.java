@@ -94,7 +94,7 @@ public class CommonService
                 {
                     return "Attendees: "+attendeesCount;
                 }
-                int attendeesforCompletedCourse = jdbcTemplate.queryForObject("select count(empId) from acceptedInvites where courseId=? and deleteStatus=false",new Object[]{courseId}, Integer.class);
+                int attendeesforCompletedCourse = jdbcTemplate.queryForObject("select count(empId) from AcceptedInvites where courseId=? and deleteStatus=false",new Object[]{courseId}, Integer.class);
                 return "Attendees: "+attendeesforCompletedCourse+"\nNon Attendees: "+nonAttendeesCount;
             }
         }
