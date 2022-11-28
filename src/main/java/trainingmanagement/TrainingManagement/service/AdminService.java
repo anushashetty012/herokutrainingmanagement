@@ -401,6 +401,27 @@ public class AdminService
         isCourseExist(courseId,false);
         String query="update Course set deleteStatus=1 where courseId=?";
         jdbcTemplate.update(query,courseId);
+        deleteFromInvitesOnCourseDelete(courseId);
+        deleteFromAcceptedInvitesOnCourseDelete(courseId);
+        deleteFromManagersCoursesOnCourseDelete(courseId);
+    }
+
+    public void deleteFromInvitesOnCourseDelete(int courseId)
+    {
+        String query = "delete from Invites where courseId=?";
+        jdbcTemplate.update(query,courseId);
+    }
+
+    public void deleteFromAcceptedInvitesOnCourseDelete(int courseId)
+    {
+        String query = "delete from AcceptedInvites where courseId=?";
+        jdbcTemplate.update(query,courseId);
+    }
+
+    public void deleteFromManagersCoursesOnCourseDelete(int courseId)
+    {
+        String query = "delete from ManagersCourses where courseId=?";
+        jdbcTemplate.update(query,courseId);
     }
 
     public void isCourseExist(int courseId,boolean deleteStatus) throws CourseDeletionException

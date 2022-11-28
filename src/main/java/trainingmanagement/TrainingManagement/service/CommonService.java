@@ -5,6 +5,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import trainingmanagement.TrainingManagement.customException.CourseDeletionException;
 import trainingmanagement.TrainingManagement.customException.CourseNotValidException;
 import trainingmanagement.TrainingManagement.customException.EmployeeNotExistException;
 import trainingmanagement.TrainingManagement.customException.EmployeeNotUnderManagerException;
@@ -315,8 +316,8 @@ public class CommonService
         }
     }
 
-    public List<EmployeeInvite> getEmployeesToInvite(int courseId,String empId) throws CourseNotValidException
-    {
+    public List<EmployeeInvite> getEmployeesToInvite(int courseId,String empId) throws CourseNotValidException, CourseDeletionException {
+        isCourseExist(courseId,false);
         isCourseIdValid(courseId);
         if(getRole((empId)).equalsIgnoreCase("admin"))
         {
@@ -418,8 +419,21 @@ public class CommonService
         }
         return "Invited successfully";
     }
-    public String inviteEmployees(int courseId,List<MultipleEmployeeRequest> inviteToEmployees, String empId) throws CourseNotValidException, EmployeeNotUnderManagerException, EmployeeNotExistException
+
+    public void isCourseExist(int courseId,boolean deleteStatus) throws CourseDeletionException
     {
+        String query="select courseId from Course where courseId=? and deleteStatus=?";
+        try
+        {
+            jdbcTemplate.queryForObject(query, Integer.class,courseId,deleteStatus);
+        }
+        catch (Exception e) {
+            throw new CourseDeletionException("Course does not");
+        }
+    }
+
+    public String inviteEmployees(int courseId,List<MultipleEmployeeRequest> inviteToEmployees, String empId) throws CourseNotValidException, EmployeeNotUnderManagerException, EmployeeNotExistException, CourseDeletionException {
+        isCourseExist(courseId,false);
         isCourseIdValid(courseId);
         checkEmployeesExist(inviteToEmployees);
         int noOfInvites = inviteToEmployees.size();

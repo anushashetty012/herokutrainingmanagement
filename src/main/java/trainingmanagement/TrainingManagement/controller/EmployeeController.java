@@ -41,7 +41,7 @@ public class EmployeeController
         CourseInfo courseData = employeeService.viewCourseDetails(courseId,authentication.getName());
         if (courseData == null)
         {
-            return new ResponseEntity<>("No such course is allocated to you",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No such course is allocated to you or the course might be deleted",HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.of(Optional.of(courseData));
     }
