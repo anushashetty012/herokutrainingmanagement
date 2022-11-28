@@ -101,7 +101,7 @@ public class AdminController
         Map<Integer,List<EmployeeInfo>> managers = adminRepository.getManagersBySearchkey(page,limit,searchKey);
         if (managers == null)
         {
-            return new ResponseEntity<>("No more managers in the company",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No match found",HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.of(Optional.of(managers));
     }
