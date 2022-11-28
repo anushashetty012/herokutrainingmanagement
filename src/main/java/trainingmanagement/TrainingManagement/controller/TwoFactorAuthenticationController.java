@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import trainingmanagement.TrainingManagement.customException.InvalidOtpException;
 import trainingmanagement.TrainingManagement.request.OtpRequest;
 import trainingmanagement.TrainingManagement.response.OtpResponse;
 import trainingmanagement.TrainingManagement.response.PasswordResponse;
@@ -21,14 +22,14 @@ public class TwoFactorAuthenticationController
     @RequestMapping(value = "/employee/otpMail", method = RequestMethod.PUT)
     public ResponseEntity<String> send2faCodeinEmail(@RequestBody OtpRequest otpRequest) throws Exception
     {
-        String twoFaCode = String.valueOf(new Random().nextInt(9999)+1000);
+        String twoFaCode = String.valueOf(new Random().nextInt(8999)+1000);
         try
         {
             emailService.sendEmail(otpRequest.getEmpId(),otpRequest.getEmailId(),twoFaCode);
         }
         catch (Exception e)
         {
-            return   ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         emailService.update2FAProperties(otpRequest,twoFaCode);
         return ResponseEntity.status(HttpStatus.OK).body("Otp sent successfully");
@@ -38,8 +39,14 @@ public class TwoFactorAuthenticationController
     @RequestMapping(value="/employee/checkCode", method=RequestMethod.PUT)
     public ResponseEntity<Object> verify(@RequestBody OtpResponse otpResponse)
     {
-        boolean isValid = emailService.checkCode(otpResponse);
-
+        boolean isValid;
+        try
+        {
+            isValid = emailService.checkCode(otpResponse);
+        }
+        catch (InvalidOtpException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
         if(isValid)
         {
             return ResponseEntity.status(HttpStatus.OK).body("OTP verified");

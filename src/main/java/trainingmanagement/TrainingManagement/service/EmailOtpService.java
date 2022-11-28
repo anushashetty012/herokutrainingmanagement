@@ -5,6 +5,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import trainingmanagement.TrainingManagement.customException.InvalidOtpException;
 import trainingmanagement.TrainingManagement.request.OtpRequest;
 import trainingmanagement.TrainingManagement.response.OtpResponse;
 import trainingmanagement.TrainingManagement.response.PasswordResponse;
@@ -75,8 +76,17 @@ public class EmailOtpService
         });
     }
 
-    public boolean checkCode(OtpResponse response)
+    public int isOtpValid(OtpResponse response)
     {
+        int status = jdbcTemplate.queryForObject("select count(*) from EmployeeOtp WHERE 2fa_code=? and empId=?",new Object[] {response.getOtpCode(), response.getEmpId()}, Integer.class);
+        return status;
+    }
+
+    public boolean checkCode(OtpResponse response) throws InvalidOtpException {
+        if(isOtpValid(response)==0)
+        {
+            throw new InvalidOtpException("Invalid OTP");
+        }
         return jdbcTemplate.queryForObject("select count(*) from EmployeeOtp WHERE 2fa_code=? and empId=?"
                 + " and 2fa_expire_time >=?", new Object[] {response.getOtpCode(), response.getEmpId(),
                 System.currentTimeMillis()/1000}, Integer.class) > 0;
