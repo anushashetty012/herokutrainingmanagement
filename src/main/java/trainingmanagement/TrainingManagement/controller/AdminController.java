@@ -63,10 +63,6 @@ public class AdminController
         {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (course1 == null)
-        {
-            return new ResponseEntity<>("Course is not created,please fill all the mandatory fields",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
         return ResponseEntity.status(HttpStatus.OK).body(course1);
     }
 

@@ -233,7 +233,7 @@ public class AdminService
         return course;
     }
 
-    public void checkStartTimeForCurrentDate(Course course) throws CourseInfoIntegrityException
+    public void checkStartTimeForCurrentTime(Course course) throws CourseInfoIntegrityException
     {
         Instant instant = Instant.now();
         String d1 = instant.toString();
@@ -299,7 +299,7 @@ public class AdminService
         if (startToCurrentDateStatus == 0)
         {
             checkStartTimeExist(course);
-            checkStartTimeForCurrentDate(course);
+            checkStartTimeForCurrentTime(course);
         }
         try {
             int i=course.getStartDate().compareTo(course.getEndDate());

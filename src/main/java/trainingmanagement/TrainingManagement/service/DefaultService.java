@@ -55,7 +55,7 @@ public class DefaultService
         Employee superAdmin = new Employee();
         superAdmin.setEmpId("RT001");
         superAdmin.setEmpName("Super Admin");
-        superAdmin.setPassword(getEncodedPassword("super123"));
+        superAdmin.setPassword(getEncodedPassword("Super@123"));
         superAdmin.setDesignation("Super Admin");
         superAdmin.setEmail("super@gmail.com");
 

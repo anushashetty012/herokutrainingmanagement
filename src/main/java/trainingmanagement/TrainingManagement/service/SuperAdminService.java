@@ -82,7 +82,6 @@ public class SuperAdminService
     {
         if ((employee.getEmpId().trim()).isEmpty())
         {
-            System.out.println((employee.getEmpId().trim()));
             throw new InvalidEmployeeDetailsException("Employee id cannot be null");
         }
         if ((employee.getEmpName().trim()).isEmpty())
