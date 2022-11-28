@@ -62,7 +62,7 @@ public class CommonController
     }
 
     //inviting employees - invited=false if they can be invited
-    @GetMapping("/getEmployeesToInvite/{courseId}")
+    @GetMapping("/employeesToInvite/{courseId}")
     @PreAuthorize("hasRole('admin') or hasRole('manager')")
     public ResponseEntity<?> getEmployeesToInvite(@PathVariable int courseId,Authentication authentication)
     {
