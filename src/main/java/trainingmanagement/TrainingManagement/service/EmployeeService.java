@@ -26,7 +26,7 @@ public class EmployeeService
     private String VIEW_COURSE_DETAILS = "SELECT courseId,courseName,trainer,trainingMode,startDate,endDate,duration,startTime,endTime,completionStatus,meetingInfo FROM Course WHERE courseId=? and deleteStatus=false";
     //for manager
     private String CHECK_COURSE_ALLOCATION = "SELECT courseId FROM ManagersCourses WHERE managerId=? AND courseId=?";
-    private String CHECK_IF_INVITED = "SELECT courseId FROM Invites where empId=? AND courseId=? and (acceptanceStatus=true)";
+    private String CHECK_IF_ACCEPTED = "SELECT courseId FROM AcceptedInvites where empId=? AND courseId=? and (deleteStatus=false)";
     private String GET_ROLE = "SELECT role_name FROM employee_role WHERE emp_id=?";
     int offset=0;
 
@@ -45,7 +45,7 @@ public class EmployeeService
         if (getRole((empId)).equalsIgnoreCase("manager"))
         {
 
-            List<Invites> isInvited = jdbcTemplate.query(CHECK_IF_INVITED,(rs, rowNum) -> {
+            List<Invites> isInvited = jdbcTemplate.query(CHECK_IF_ACCEPTED,(rs, rowNum) -> {
                 return new Invites(rs.getInt("courseId"));
             },empId,courseId);
             List<ManagersCourses> isCourseAssigned = jdbcTemplate.query(CHECK_COURSE_ALLOCATION,(rs, rowNum) -> {
@@ -58,7 +58,7 @@ public class EmployeeService
         }
         if (getRole((empId)).equalsIgnoreCase("employee"))
         {
-            List<Invites> isInvited = jdbcTemplate.query(CHECK_IF_INVITED,(rs, rowNum) -> {
+            List<Invites> isInvited = jdbcTemplate.query(CHECK_IF_ACCEPTED,(rs, rowNum) -> {
                 return new Invites(rs.getInt("courseId"));
             },empId,courseId);
             if (isInvited.size()!=0)
@@ -86,7 +86,7 @@ public class EmployeeService
         }
         if (getRole((empId)).equalsIgnoreCase("manager"))
         {
-            List<Invites> isInvited = jdbcTemplate.query(CHECK_IF_INVITED,(rs, rowNum) -> {
+            List<Invites> isInvited = jdbcTemplate.query(CHECK_IF_ACCEPTED,(rs, rowNum) -> {
                 return new Invites(rs.getInt("courseId"));
             },empId,courseId);
 
@@ -104,7 +104,7 @@ public class EmployeeService
         {
             try
             {
-                List<Invites> isInvited = jdbcTemplate.query(CHECK_IF_INVITED,(rs, rowNum) -> {
+                List<Invites> isInvited = jdbcTemplate.query(CHECK_IF_ACCEPTED,(rs, rowNum) -> {
                     return new Invites(rs.getInt("courseId"));
                 },empId,courseId);
                 if (isInvited.size()!=0)
