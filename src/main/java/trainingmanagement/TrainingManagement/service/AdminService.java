@@ -3,6 +3,8 @@ package trainingmanagement.TrainingManagement.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Repository;
 import trainingmanagement.TrainingManagement.customException.*;
 import trainingmanagement.TrainingManagement.entity.Course;
@@ -32,6 +34,8 @@ public class AdminService
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JavaMailSender mailSender;
 
     public Timestamp createTimestamp(Date date, Time time)
     {
@@ -161,6 +165,17 @@ public class AdminService
         for (int i = 0; i < noOfManagers; i++)
         {
             jdbcTemplate.update(ASSIGN_MANAGER, new Object[]{courseToManager.get(i).getEmpId(), courseId});
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("spring.email.from@gmail.com");
+            String query = "select email from employee where emp_id=?";
+            String query1 = "select courseName from Course where courseId=?";
+            String email = jdbcTemplate.queryForObject(query, String.class,courseToManager.get(i).getEmpId());
+            message.setTo(email);
+            String courseName = jdbcTemplate.queryForObject(query1, String.class,courseId);
+            String emailText ="You have been assigned "+courseName+" course";
+            message.setText(emailText);
+            message.setSubject("Course assigned");
+            mailSender.send(message);
         }
         return "Course allocated successfully";
     }

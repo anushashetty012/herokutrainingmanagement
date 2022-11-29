@@ -11,4 +11,5 @@ public class EmployeeDetails
     private Integer attendedCount;
     private Integer upcomingCount;
     private Integer activeCount;
+    private String role;
 }

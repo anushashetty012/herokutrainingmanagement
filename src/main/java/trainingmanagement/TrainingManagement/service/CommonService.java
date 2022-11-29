@@ -575,7 +575,7 @@ public class CommonService
     //Gives List of Employees for Admin
     public List<EmployeeDetails> employeeDetailsListForAdmin(int offset,int limit)
     {
-        String queryForEmployees = "SELECT emp_id, emp_name, designation FROM employee WHERE delete_status = 0 AND employee.emp_id <> 'RT001' limit ?,?";
+        String queryForEmployees = "SELECT employee.emp_id, emp_name, designation,role_name FROM employee,employee_role WHERE employee.emp_id=employee_role.emp_id and delete_status = 0 AND employee.emp_id <> 'RT001' limit ?,?";
         List<EmployeeDetails> a = jdbcTemplate.query(queryForEmployees,new BeanPropertyRowMapper<EmployeeDetails>(EmployeeDetails.class),offset,limit);
         return a;
     }
@@ -583,7 +583,7 @@ public class CommonService
     //Gives List of Employees for Manager
     public List<EmployeeDetails> employeeDetailsListForManager(String managerId,int offset,int limit)
     {
-        String queryForEmployees = "SELECT emp_id, emp_name, designation FROM employee, Manager WHERE employee.emp_id = Manager.empId and Manager.managerId = ? AND delete_status = 0 AND employee.emp_id <> 'RT001' limit ?,?";
+        String queryForEmployees = "SELECT emp_id, emp_name, designation,role_name FROM employee, Manager,employee_role WHERE employee.emp_id=employee_role.emp_id and employee.emp_id = Manager.empId and Manager.managerId = ? AND delete_status = 0 AND employee.emp_id <> 'RT001' limit ?,?";
 
         return jdbcTemplate.query(queryForEmployees,new BeanPropertyRowMapper<EmployeeDetails>(EmployeeDetails.class),managerId,offset,limit);
     }
