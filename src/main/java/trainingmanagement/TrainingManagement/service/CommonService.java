@@ -13,6 +13,7 @@ import trainingmanagement.TrainingManagement.entity.Course;
 import trainingmanagement.TrainingManagement.entity.Employee;
 import trainingmanagement.TrainingManagement.entity.ManagersCourses;
 import trainingmanagement.TrainingManagement.request.FilterByDate;
+import trainingmanagement.TrainingManagement.response.CourseList;
 import trainingmanagement.TrainingManagement.response.EmployeeDetails;
 import trainingmanagement.TrainingManagement.response.EmployeeInvite;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
@@ -26,6 +27,8 @@ import java.util.Map;
 @Service
 public class CommonService
 {
+    private String TRAINING_COUNT = "SELECT COUNT(courseId) FROM Course WHERE completionStatus=? and deleteStatus=false";
+    private String GET_COURSE = "SELECT courseId,courseName,trainer,trainingMode,startDate,endDate,duration,startTime,endTime,completionStatus FROM Course WHERE completionStatus=? and deleteStatus=false limit ?,?";
     //for manager
     private String CHECK_COURSE_ALLOCATION = "SELECT courseId FROM ManagersCourses WHERE managerId=? AND courseId=?";
     private String GET_ATTENDEES_COUNT = "SELECT COUNT(empId) FROM Invites WHERE courseId=? AND Invites.inviteId NOT IN (SELECT RejectedInvites.inviteId FROM RejectedInvites)";
@@ -51,6 +54,26 @@ public class CommonService
     int offset=0;
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    public int getCourseCountByStatus(String status)
+    {
+        return jdbcTemplate.queryForObject(TRAINING_COUNT, new Object[]{status}, Integer.class);
+    }
+
+    public Map<Integer,List<CourseList>> getCourse(String completionStatus, int page, int limit)
+    {
+        Map map = new HashMap<Integer,List>();
+        offset = limit *(page-1);
+        List<CourseList> courses = jdbcTemplate.query(GET_COURSE,(rs, rowNum) -> {
+            return new CourseList(rs.getInt("courseId"),rs.getString("courseName"),rs.getString("trainer"),rs.getString("trainingMode"),rs.getDate("startDate"),rs.getDate("endDate"),rs.getTime("duration"),rs.getTime("startTime"),rs.getTime("endTime"),rs.getString("completionStatus"));
+        },completionStatus,offset,limit);
+        if (courses.size()!=0)
+        {
+            map.put(courses.size(),courses);
+            return map;
+        }
+        return null;
+    }
 
     //to get role
     public String getRole(String empId)
@@ -107,7 +130,7 @@ public class CommonService
 
     public String getAttendeesAndNonAttendeesCount(int courseId,String empId)
     {
-        if(getRole((empId)).equalsIgnoreCase("admin"))
+        if(getRole((empId)).equalsIgnoreCase("admin") || getRole((empId)).equalsIgnoreCase("super_admin"))
         {
             String employeeCount = getAttendeesAndNonAttendeesForAdmin(courseId);
             return employeeCount;
@@ -535,7 +558,7 @@ public class CommonService
         offset = limit *(page-1);
         String role = getRole(empId);
         List<EmployeeDetails> employeeDetails;
-        if(role.equals("admin"))
+        if(role.equals("admin") || role.equals("super_admin"))
         {
             employeeDetails= employeeDetailsListForAdmin(offset,limit);
         }

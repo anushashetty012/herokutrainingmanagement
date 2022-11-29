@@ -24,31 +24,6 @@ public class AdminController
     @Autowired
     AdminService adminRepository;
 
-    @GetMapping("/company/trainings/count/{completionStatus}")
-    @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<?> trainingCountByStatus(@PathVariable String completionStatus)
-    {
-        int count = adminRepository.getCourseCountByStatus(completionStatus);
-        if (count == 0)
-        {
-            return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.of(Optional.of(count));
-    }
-
-    //get the list of course based on completion status
-    @GetMapping("/company/courses/{completionStatus}")
-    @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<?> getCourse(@PathVariable String completionStatus, @RequestParam int page, @RequestParam int limit)
-    {
-        Map<Integer,List<CourseList>> courses = adminRepository.getCourse(completionStatus,page,limit);
-        if (courses == null)
-        {
-            return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.of(Optional.of(courses));
-    }
-
     //create course
     @PostMapping("/createCourse")
     @PreAuthorize("hasRole('admin')")
@@ -80,7 +55,7 @@ public class AdminController
         return ResponseEntity.of(Optional.of(courseList));
     }
 
-    //gets the list of managers
+    //gets the list of managers to allocate reportees
     @GetMapping("/managers")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<?> getManagers(@RequestParam int page, @RequestParam int limit)
@@ -93,12 +68,44 @@ public class AdminController
         return ResponseEntity.of(Optional.of(managers));
     }
 
-    //search managers by search key
+    //search managers by search key- to allocate reportees
     @GetMapping("/managersBySearchKey")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<?> getManagersBySearchKey(@RequestParam int page, @RequestParam int limit,@RequestParam String searchKey)
     {
         Map<Integer,List<EmployeeInfo>> managers = adminRepository.getManagersBySearchkey(page,limit,searchKey);
+        if (managers == null)
+        {
+            return new ResponseEntity<>("No match found",HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.of(Optional.of(managers));
+    }
+
+    @GetMapping("/managersToAssignCourse/{courseId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<?> getManagersToAssignCourse(@PathVariable int courseId, @RequestParam int page, @RequestParam int limit)
+    {
+        Map<Integer,List<EmployeeInfo>> managers;
+        try
+        {
+            managers = adminRepository.getManagersToAssignCourse(courseId,page,limit);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Refresh the page and try again");
+        }
+        if (managers == null)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No managers found");
+        }
+        return ResponseEntity.of(Optional.of(managers));
+    }
+
+    @GetMapping("/managersToAssignCourse/searchKey/{courseId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<?> getManagersToAssignCourseBySearchKey(@PathVariable int courseId,@RequestParam int page, @RequestParam int limit,@RequestParam String searchKey)
+    {
+        Map<Integer,List<EmployeeInfo>> managers = adminRepository.getManagersToAssignCourseBySearchkey(courseId,page,limit,searchKey);
         if (managers == null)
         {
             return new ResponseEntity<>("No match found",HttpStatus.NOT_FOUND);
@@ -118,11 +125,7 @@ public class AdminController
         }
         catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-        if ( assignStatus == null )
-        {
-            return new ResponseEntity<>("This course is already allocated to this manager",HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Refresh the page and try again");
         }
         return ResponseEntity.of(Optional.of(assignStatus));
     }

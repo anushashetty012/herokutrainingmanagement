@@ -25,8 +25,33 @@ public class CommonController
     @Autowired
     CommonService commonService;
 
+    @GetMapping("/company/trainings/count/{completionStatus}")
+    @PreAuthorize("hasRole('admin') or hasRole('super_admin')")
+    public ResponseEntity<?> trainingCountByStatus(@PathVariable String completionStatus)
+    {
+        int count = commonService.getCourseCountByStatus(completionStatus);
+        if (count == 0)
+        {
+            return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.of(Optional.of(count));
+    }
+
+    //get the list of course based on completion status
+    @GetMapping("/company/courses/{completionStatus}")
+    @PreAuthorize("hasRole('admin') or hasRole('super_admin')")
+    public ResponseEntity<?> getCourse(@PathVariable String completionStatus, @RequestParam int page, @RequestParam int limit)
+    {
+        Map<Integer,List<CourseList>> courses = commonService.getCourse(completionStatus,page,limit);
+        if (courses == null)
+        {
+            return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.of(Optional.of(courses));
+    }
+
     @GetMapping("/attendees_nonAttendees_count/{courseId}")
-    @PreAuthorize("hasRole('admin') or hasRole('manager')")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('super_admin')")
     public ResponseEntity<?> getAttendeesAndNonAttendeesCount(@PathVariable int courseId,Authentication authentication)
     {
         String employeeCount = commonService.getAttendeesAndNonAttendeesCount(courseId,authentication.getName());
@@ -123,7 +148,7 @@ public class CommonController
 
     //Get List of All Employees
     @GetMapping("/employees")
-    @PreAuthorize("hasRole('admin') or hasRole('manager')")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('super_admin')")
     public ResponseEntity<?> getEmployeeList(Authentication authentication,@RequestParam int page, @RequestParam int limit)
     {
         String empId = authentication.getName();

@@ -47,10 +47,6 @@ public class SuperAdminService
     int offset=0;
 
     public void registerEmployee(Employee employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException, InvalidEmployeeDetailsException {
-        isEmployeeDetailValid(employee);
-        checkEmployeeExist(employee.getEmpId());
-        checkEmailExist(employee.getEmail());
-        isSuperAdminId(employee.getEmpId());
         Roles roles = roleDao.findById("employee").get();
         Set<Roles> employeeRoles = new HashSet<>();
 
@@ -78,6 +74,12 @@ public class SuperAdminService
             throw new InvalidEmployeeDetailsException("Email already exists, register with different email");
         }
     }
+    public void checkValidityOfEmployees(Employee employee) throws InvalidEmployeeDetailsException, EmployeeExistException, SuperAdminIdException {
+        isEmployeeDetailValid(employee);
+        checkEmployeeExist(employee.getEmpId());
+        checkEmailExist(employee.getEmail());
+        isSuperAdminId(employee.getEmpId());
+    }
     public void isEmployeeDetailValid(Employee employee) throws InvalidEmployeeDetailsException
     {
         if ((employee.getEmpId().trim()).isEmpty())
@@ -102,11 +104,20 @@ public class SuperAdminService
         }
     }
 
-    public void registerNewEmployee(List<Employee> employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException, InvalidEmployeeDetailsException {
+    public List<String> registerNewEmployee(List<Employee> employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException, InvalidEmployeeDetailsException {
+        List<String> invalidEmployeeList = new ArrayList<>();
         for (Employee emp:employee)
         {
-            registerEmployee(emp);
+            try
+            {
+                checkValidityOfEmployees(emp);
+                registerEmployee(emp);
+            }
+            catch (Exception e) {
+                invalidEmployeeList.add(emp.getEmpId()+" Not registered because "+e.getMessage());
+            }
         }
+        return invalidEmployeeList;
     }
     public void checkEmployeeExist(String empId) throws EmployeeExistException
     {
@@ -165,12 +176,23 @@ public class SuperAdminService
     {
         return passwordEncoder.encode(password);
     }
-    public void deleteEmployees(List<MultipleEmployeeRequest> empId) throws EmployeeNotExistException, EmployeeExistException, SuperAdminIdException
-    {
+
+    public void deleteListValid(List<MultipleEmployeeRequest> empId) throws EmployeeNotExistException, EmployeeExistException {
         for (MultipleEmployeeRequest emp:empId)
         {
-            employeeExist(emp.getEmpId());
-            checkEmployeeDeleted(emp.getEmpId());
+            isEmployeeValidToDelete(emp);
+        }
+    }
+    public void isEmployeeValidToDelete(MultipleEmployeeRequest emp) throws EmployeeExistException, EmployeeNotExistException
+    {
+        employeeExist(emp.getEmpId());
+        checkEmployeeDeleted(emp.getEmpId());
+    }
+    public void deleteEmployees(List<MultipleEmployeeRequest> empId) throws EmployeeNotExistException, EmployeeExistException, SuperAdminIdException
+    {
+        deleteListValid(empId);
+        for (MultipleEmployeeRequest emp:empId)
+        {
             deleteEmployee(emp.getEmpId());
             deleteFromEmployeeRoleOnEmpDelete(emp.getEmpId());
             deleteFromInvitesOnEmpDelete(emp.getEmpId());
@@ -200,16 +222,6 @@ public class SuperAdminService
         isSuperAdminId(empId);
         String query="update employee set delete_status=1 where emp_id=?";
         jdbcTemplate.update(query,empId);
-    }
-
-    public Map<Integer,List<EmployeeProfile>> employeeDetailsListForSuperAdmin(int page, int limit)
-    {
-        Map map = new HashMap<Integer,List>();
-        offset = limit *(page-1);
-        String queryForEmployees = "SELECT emp_id, emp_name, designation,profile_pic FROM employee WHERE delete_status = 0 AND emp_id <> 'RT001' limit ?,?";
-        List<EmployeeProfile> a = jdbcTemplate.query(queryForEmployees,new BeanPropertyRowMapper<EmployeeProfile>(EmployeeProfile.class),offset,limit);
-        map.put(a.size(),a);
-        return map;
     }
 
     public void isSuperAdminId(String empId) throws SuperAdminIdException

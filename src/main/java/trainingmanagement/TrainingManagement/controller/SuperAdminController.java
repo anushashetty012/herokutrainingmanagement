@@ -24,12 +24,16 @@ public class SuperAdminController
 
     @PostMapping("/registerEmployees")
     @PreAuthorize("hasRole('super_admin')")
-    public ResponseEntity<String> registerEmployees(@RequestBody List<Employee> employee)
+    public ResponseEntity<?> registerEmployees(@RequestBody List<Employee> employee)
     {
         try
         {
-            superAdminService.registerNewEmployee(employee);
-            return ResponseEntity.of(Optional.of( " Registration successful"));
+            List<String> invalidEmployeeList = superAdminService.registerNewEmployee(employee);
+            if (invalidEmployeeList.size()==0)
+            {
+                return ResponseEntity.of(Optional.of( " Registration successful"));
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(invalidEmployeeList);
         }
         catch (Exception e)
         {
@@ -52,7 +56,7 @@ public class SuperAdminController
         return ResponseEntity.of(Optional.of( roleStatus));
     }
 
-    @PatchMapping("/delete/Employees")
+    @PatchMapping("/delete/employees")
     @PreAuthorize("hasRole('super_admin')")
     public ResponseEntity<String> deleteEmployees(@RequestBody List<MultipleEmployeeRequest> employees)
     {
@@ -63,14 +67,7 @@ public class SuperAdminController
         }
         catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Refresh the page and try again");
         }
-    }
-
-    @GetMapping("/employees")
-    @PreAuthorize("hasRole('super_admin')")
-    public ResponseEntity<?> employees(@RequestParam int page, @RequestParam int limit)
-    {
-       return ResponseEntity.status(HttpStatus.OK).body(superAdminService.employeeDetailsListForSuperAdmin(page,limit));
     }
 }
