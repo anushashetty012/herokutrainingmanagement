@@ -2,6 +2,7 @@ package trainingmanagement.TrainingManagement.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,6 +14,8 @@ import trainingmanagement.TrainingManagement.request.ManagerEmployees;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
 import trainingmanagement.TrainingManagement.response.CourseList;
 import trainingmanagement.TrainingManagement.response.EmployeeInfo;
+import trainingmanagement.TrainingManagement.response.EmployeesToManager;
+
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -353,14 +356,48 @@ public class AdminService
             throw new CourseInfoIntegrityException("Training mode is not valid");
         }
     }
+    public Map<Integer,List<EmployeesToManager>> employeesToAssignManager(String managerId, int page, int limit) throws EmployeeNotExistException, ManagerNotExistException, SuperAdminIdException {
+        checkEmployeeExist(managerId);
+        checkManagerExist(managerId);
+        isSuperAdminId(managerId);
+        Map map = new HashMap<Integer,List>();
+        offset = limit *(page-1);
+        String query = "select employee.emp_id, emp_name, designation, managerId from employee, Manager \n" +
+                "where employee.emp_id=Manager.empId and employee.emp_id<>'RT001' and employee.emp_id<>? and employee.delete_status=false\n" +
+                "and employee.emp_id not in (select empId from Manager where managerId=?) limit ?,?";
+        List<EmployeesToManager> employeeDetails =  jdbcTemplate.query(query,new BeanPropertyRowMapper<EmployeesToManager>(EmployeesToManager.class),managerId,managerId,offset,limit);
+        if (employeeDetails.size() != 0)
+        {
+            map.put(employeeDetails.size(),employeeDetails);
+            return map;
+        }
+        return null;
+    }
+
+    public void checkManagerValid(String managerId) throws EmployeeNotExistException, ManagerNotExistException, SuperAdminIdException {
+        checkEmployeeExist(managerId);
+        checkManagerExist(managerId);
+        isSuperAdminId(managerId);
+    }
+    public void checkValidityOfEmployeeList(String empId, String managerId) throws SuperAdminIdException, EmployeeNotExistException, ManagerEmployeeSameException {
+        isSuperAdminId(empId);
+        checkEmployeeExist(empId);
+        checkManagerIdAndEmployeeIdSame(empId,managerId);
+    }
+
+    public void checkValidityOfEmployeesList(ManagerEmployees managerEmployees) throws SuperAdminIdException, EmployeeNotExistException, ManagerEmployeeSameException {
+        for (String emp: managerEmployees.getEmpId())
+        {
+            checkValidityOfEmployeeList(emp,managerEmployees.getManagerId());
+        }
+    }
 
     //can't do anything if emplist contain super admin empId
     public void assignEmployeesToManager(ManagerEmployees managerEmployees) throws ManagerNotExistException, EmployeeNotExistException, ManagerEmployeeSameException, SuperAdminIdException
     {
         String managerId=managerEmployees.getManagerId();
-        checkEmployeeExist(managerId);
-        checkManagerExist(managerId);
-        isSuperAdminId(managerId);
+        checkManagerValid(managerId);
+        checkValidityOfEmployeesList(managerEmployees);
         if (managerEmployees.getEmpId()==null || managerEmployees.getEmpId().size()==0)
         {
             throw new EmployeeNotExistException("Employee Id list is empty");
@@ -373,9 +410,6 @@ public class AdminService
 
     public void updateEmployeesForManger(String empId,String managerId) throws EmployeeNotExistException, ManagerEmployeeSameException, SuperAdminIdException
     {
-        isSuperAdminId(empId);
-        checkEmployeeExist(empId);
-        checkManagerIdAndEmployeeIdSame(empId,managerId);
         String query="update Manager set managerId=? where empId=?";
         jdbcTemplate.update(query,managerId,empId);
     }

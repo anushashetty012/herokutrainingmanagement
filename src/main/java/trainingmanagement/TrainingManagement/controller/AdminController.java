@@ -6,11 +6,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import trainingmanagement.TrainingManagement.customException.CourseInfoIntegrityException;
+import trainingmanagement.TrainingManagement.customException.EmployeeNotExistException;
+import trainingmanagement.TrainingManagement.customException.ManagerNotExistException;
+import trainingmanagement.TrainingManagement.customException.SuperAdminIdException;
 import trainingmanagement.TrainingManagement.entity.Course;
 import trainingmanagement.TrainingManagement.request.ManagerEmployees;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
 import trainingmanagement.TrainingManagement.response.CourseList;
 import trainingmanagement.TrainingManagement.response.EmployeeInfo;
+import trainingmanagement.TrainingManagement.response.EmployeesToManager;
 import trainingmanagement.TrainingManagement.service.AdminService;
 
 import java.util.List;
@@ -149,6 +153,26 @@ public class AdminController
         return ResponseEntity.status(HttpStatus.OK).body("Updated successfully");
     }
 
+    @GetMapping("/employeesToAssignManager/{managerId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<?> employeesToAssignManager(@PathVariable String managerId,@RequestParam int page, @RequestParam int limit)
+    {
+        Map<Integer,List<EmployeesToManager>> employees;
+        try
+        {
+            employees = adminRepository.employeesToAssignManager(managerId,page,limit);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Refresh the page and try again");
+        }
+        if (employees == null)
+        {
+            return new ResponseEntity<>("No employees found",HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(employees);
+    }
+
     @PutMapping("/assignManager/employees")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> assignManager(@RequestBody ManagerEmployees managerEmployees)
@@ -159,7 +183,7 @@ public class AdminController
             return ResponseEntity.status(HttpStatus.OK).body("Manager assigned successfully");
         } catch (Exception e)
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Refresh the page and try again");
         }
     }
     @DeleteMapping("/delete/course/{courseId}")
