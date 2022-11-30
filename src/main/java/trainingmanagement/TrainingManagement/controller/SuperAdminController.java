@@ -49,7 +49,7 @@ public class SuperAdminController
         return ResponseEntity.of(Optional.of( roleStatus));
     }
 
-    @PatchMapping("/delete/employees")
+    @PutMapping("/delete/employees")
     @PreAuthorize("hasRole('super_admin')")
     public ResponseEntity<String> deleteEmployees(@RequestBody List<MultipleEmployeeRequest> employees)
     {
