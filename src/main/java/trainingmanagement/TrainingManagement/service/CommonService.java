@@ -645,7 +645,7 @@ public class CommonService
     //Gives List of Employees for Manager
     public List<EmployeeDetails> employeeDetailsListForManagerBySearchKey(String managerId, String searchKey,int offset,int limit)
     {
-        String queryForEmployees = "SELECT employee.emp_id, emp_name, designation,role_name FROM employee,employee_role Manager WHERE employee.emp_id=employee_role.emp_id and employee.emp_id = Manager.empId and (employee.emp_id = ? or emp_name like ? or designation like ?) and Manager.managerId = ? AND delete_status = 0 AND employee.emp_id <> 'RT001' limit ?,?";
+        String queryForEmployees = "SELECT employee.emp_id, emp_name, designation,role_name FROM employee,employee_role, Manager WHERE employee.emp_id=employee_role.emp_id and employee.emp_id = Manager.empId and (employee.emp_id = ? or emp_name like ? or designation like ?) and Manager.managerId = ? AND delete_status = 0 AND employee.emp_id <> 'RT001' limit ?,?";
         return jdbcTemplate.query(queryForEmployees,(rs, rowNum) -> {
             return new EmployeeDetails(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),rs.getString("role_name"));
         },searchKey,"%"+searchKey+"%","%"+searchKey+"%",managerId,offset,limit);
