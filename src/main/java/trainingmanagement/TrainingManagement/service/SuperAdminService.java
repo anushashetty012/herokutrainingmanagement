@@ -104,7 +104,7 @@ public class SuperAdminService
         }
     }
 
-    public List<String> registerNewEmployee(List<Employee> employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException, InvalidEmployeeDetailsException {
+    public List<String> registerNewEmployee(List<Employee> employee) {
         List<String> invalidEmployeeList = new ArrayList<>();
         for (Employee emp:employee)
         {
@@ -157,7 +157,7 @@ public class SuperAdminService
         message.setText(emailText);
         message.setSubject("Role changed");
         mailSender.send(message);
-        return "Role changed to "+employeeRole.getRoleName();
+        return "Role of "+employeeRole.getEmpId()+" changed to "+employeeRole.getRoleName();
     }
 
     public void employeeExist(String empId) throws EmployeeExistException

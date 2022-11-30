@@ -26,19 +26,13 @@ public class SuperAdminController
     @PreAuthorize("hasRole('super_admin')")
     public ResponseEntity<?> registerEmployees(@RequestBody List<Employee> employee)
     {
-        try
-        {
             List<String> invalidEmployeeList = superAdminService.registerNewEmployee(employee);
             if (invalidEmployeeList.size()==0)
             {
                 return ResponseEntity.of(Optional.of( " Registration successful"));
             }
             return ResponseEntity.status(HttpStatus.OK).body(invalidEmployeeList);
-        }
-        catch (Exception e)
-        {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+
     }
 
     @PutMapping("/changeRole")
