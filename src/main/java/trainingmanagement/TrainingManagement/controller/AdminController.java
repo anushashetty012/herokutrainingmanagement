@@ -188,7 +188,7 @@ public class AdminController
     }
     @DeleteMapping("/delete/course/{courseId}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<String> deleteEmployees(@PathVariable Integer courseId)
+    public ResponseEntity<String> deleteCourse(@PathVariable Integer courseId)
     {
         try
         {
