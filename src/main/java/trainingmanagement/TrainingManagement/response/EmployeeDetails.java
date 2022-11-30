@@ -12,4 +12,11 @@ public class EmployeeDetails
     private Integer upcomingCount;
     private Integer activeCount;
     private String role;
+
+    public EmployeeDetails(String empId, String empName, String designation, String role) {
+        this.empId = empId;
+        this.empName = empName;
+        this.designation = designation;
+        this.role = role;
+    }
 }
