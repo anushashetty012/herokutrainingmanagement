@@ -67,7 +67,7 @@ public class SuperAdminService
     }
     public void checkEmailExist( String email) throws InvalidEmployeeDetailsException
     {
-        String query="select count(email) from employee where email=?";
+        String query="select count(email) from employee where email=? and delete_status=false";
         int i = jdbcTemplate.queryForObject(query, Integer.class,email);
         if(i >= 1)
         {
