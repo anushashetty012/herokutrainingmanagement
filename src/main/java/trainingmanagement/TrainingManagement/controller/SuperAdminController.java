@@ -12,6 +12,8 @@ import trainingmanagement.TrainingManagement.entity.Employee;
 import trainingmanagement.TrainingManagement.entity.EmployeeRole;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
 import trainingmanagement.TrainingManagement.service.SuperAdminService;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +31,9 @@ public class SuperAdminController
         List<String> invalidEmployeeList = superAdminService.registerNewEmployee(employee);
         if (invalidEmployeeList.size() == 0)
         {
-            return ResponseEntity.of(Optional.of(" Registration successful"));
+            List<String> validResponse = new ArrayList<>();
+            validResponse.add("Registration successful");
+            return ResponseEntity.of(Optional.of(validResponse));
         }
         return ResponseEntity.status(HttpStatus.OK).body(invalidEmployeeList);
     }

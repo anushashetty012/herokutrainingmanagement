@@ -262,15 +262,20 @@ public class AdminService
         return course;
     }
 
-    public void checkStartTimeForCurrentTime(Course course) throws CourseInfoIntegrityException
+    public Timestamp getCurrentTimestamp()
     {
         Instant instant = Instant.now();
         String d1 = instant.toString();
         Instant s = Instant.parse(d1);
         ZoneId.of("Asia/Kolkata");
         LocalDateTime l = LocalDateTime.ofInstant(s, ZoneId.of("Asia/Kolkata"));
+        return Timestamp.valueOf(l);
+    }
+
+    public void checkStartTimeForCurrentTime(Course course) throws CourseInfoIntegrityException
+    {
         Timestamp startTimestamp=createTimestamp(course.getStartDate(),course.getStartTime());
-        if (0 > startTimestamp.compareTo(Timestamp.valueOf(l)))
+        if (0 > startTimestamp.compareTo(getCurrentTimestamp()))
         {
             throw new CourseInfoIntegrityException("Start time should be greater than current time");
         }
