@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +47,7 @@ public class SuperAdminService
     private String CHANGING_ROLES = "UPDATE employee_role SET role_name=? WHERE emp_id=?";
     int offset=0;
 
-    public void registerEmployee(Employee employee) throws EmployeeExistException, EmployeeNotExistException, SuperAdminIdException, InvalidEmployeeDetailsException {
+    public void registerEmployee(Employee employee) throws MailException {
         Roles roles = roleDao.findById("employee").get();
         Set<Roles> employeeRoles = new HashSet<>();
 
@@ -101,6 +102,10 @@ public class SuperAdminService
         if ((employee.getEmail().trim()).isEmpty())
         {
             throw new InvalidEmployeeDetailsException("Employee email id cannot be null");
+        }
+        if (!((employee.getEmail().trim()).contains("@") && (employee.getEmail().trim()).contains(".")))
+        {
+            throw new InvalidEmployeeDetailsException("Email format is incorrect (include @ and .)");
         }
     }
 
