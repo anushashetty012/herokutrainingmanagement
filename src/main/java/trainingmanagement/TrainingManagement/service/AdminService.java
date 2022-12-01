@@ -234,7 +234,7 @@ public class AdminService
         }
     }
 
-    public int updateCourses(Course course) throws CourseInfoIntegrityException
+    public int updateCourses(Course course)
     {
         Timestamp startTimestamp=createTimestamp(course.getStartDate(),course.getStartTime());
         Timestamp endTimestamp=null;
@@ -311,6 +311,59 @@ public class AdminService
             }
         }
     }
+    public int compare(int a,int b)
+    {
+        if(a==b)
+        {
+            return 0;
+        }
+        if(a>b)
+        {
+            return 1;
+        }
+        return -1;
+    }
+
+    public int compareCurrentdateToStartdate(Timestamp startTimestamp, Timestamp currentTimestamp)
+    {
+        int startDate,currentDate,startMonth,currentMonth,startYear,currentYear;
+        startDate = startTimestamp.getDate();
+        currentDate = currentTimestamp.getDate();
+        startMonth = startTimestamp.getMonth();
+        currentMonth = currentTimestamp.getMonth();
+        startYear = startTimestamp.getYear();
+        currentYear = currentTimestamp.getYear();
+
+        int yearStatus=compare(startYear,currentYear);
+        int monthStatus=compare(startMonth,currentMonth);
+        int dateStatus=compare(startDate,currentDate);
+
+        if(yearStatus==0)
+        {
+            if (monthStatus==0)
+            {
+                if (dateStatus==0)
+                {
+                    return 0;
+                }
+                if (dateStatus>0)
+                {
+                    return 1;
+                }
+                return -1;
+            }
+            if (monthStatus>0)
+            {
+                return 1;
+            }
+            return -1;
+        }
+        if(yearStatus>0)
+        {
+            return 1;
+        }
+        return -1;
+    }
 
     public void courseInfoIntegrity(Course course) throws CourseInfoIntegrityException
     {
@@ -320,13 +373,9 @@ public class AdminService
         }
         checkEndTimeExistForEndDate(course);
         courseModeIntegrity(course.getTrainingMode());
-        long millis=System.currentTimeMillis();
-        java.sql.Date date=new java.sql.Date(millis);
-        String str= date.toString();
-        LocalDate currentDate = Date.valueOf(str).toLocalDate();
-        LocalDate startDate = course.getStartDate().toLocalDate();
-        int startToCurrentDateStatus = currentDate.compareTo(startDate);
-        if(0 < startToCurrentDateStatus)
+        Timestamp startTimestamp = createTimestamp(course.getStartDate(),course.getStartTime());
+        int startToCurrentDateStatus = compareCurrentdateToStartdate(startTimestamp,getCurrentTimestamp());
+        if(0 > startToCurrentDateStatus)
         {
             throw new CourseInfoIntegrityException("start date can't be before  current date");
         }
