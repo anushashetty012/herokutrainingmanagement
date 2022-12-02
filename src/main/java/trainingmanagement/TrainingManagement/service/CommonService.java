@@ -619,7 +619,7 @@ public class CommonService
         offset = limit *(page-1);
         String role = getRole(empId);
         List<EmployeeDetails> employeeDetails;
-        if(role.equals("admin"))
+        if(role.equals("admin")|| role.equals("super_admin"))
         {
             employeeDetails= employeeDetailsListForAdminBySearchKey(searchKey,offset,limit);
         }
