@@ -11,6 +11,7 @@ import trainingmanagement.TrainingManagement.customException.SuperAdminIdExcepti
 import trainingmanagement.TrainingManagement.entity.Employee;
 import trainingmanagement.TrainingManagement.entity.EmployeeRole;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
+import trainingmanagement.TrainingManagement.response.RegistrationResponse;
 import trainingmanagement.TrainingManagement.service.SuperAdminService;
 
 import java.util.ArrayList;
@@ -28,11 +29,13 @@ public class SuperAdminController
     @PreAuthorize("hasRole('super_admin')")
     public ResponseEntity<?> registerEmployees(@RequestBody List<Employee> employee)
     {
-        List<String> invalidEmployeeList = superAdminService.registerNewEmployee(employee);
+        List<RegistrationResponse> invalidEmployeeList = superAdminService.registerNewEmployee(employee);
         if (invalidEmployeeList.size() == 0)
         {
-            List<String> validResponse = new ArrayList<>();
-            validResponse.add("Registration successful");
+            List<RegistrationResponse> validResponse = new ArrayList<>();
+            RegistrationResponse response = new RegistrationResponse();
+            response.setReason("Registration successful");
+            validResponse.add(response);
             return ResponseEntity.of(Optional.of(validResponse));
         }
         return ResponseEntity.status(HttpStatus.OK).body(invalidEmployeeList);

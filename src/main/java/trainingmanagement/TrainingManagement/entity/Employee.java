@@ -20,6 +20,8 @@ public class Employee
     private String profilePic;
     @JsonIgnore
     private Boolean deleteStatus = false;
+    @JsonIgnore
+    private Timestamp creationTimestamp;
 
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -97,6 +99,14 @@ public class Employee
 
     public void setDeleteStatus(Boolean deleteStatus) {
         this.deleteStatus = deleteStatus;
+    }
+
+    public Timestamp getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    public void setCreationTimestamp(Timestamp creationTimestamp) {
+        this.creationTimestamp = creationTimestamp;
     }
 
     public Employee(String empId)

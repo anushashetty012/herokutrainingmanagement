@@ -21,7 +21,9 @@ import trainingmanagement.TrainingManagement.entity.Roles;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
 import trainingmanagement.TrainingManagement.response.EmployeeDetails;
 import trainingmanagement.TrainingManagement.response.EmployeeProfile;
+import trainingmanagement.TrainingManagement.response.RegistrationResponse;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -63,6 +65,7 @@ public class SuperAdminService
         mailSender.send(message);
         employee.setPassword(getEncodedPassword(employee.getPassword()));
         String query =  "insert into Manager(empId) values(?)";
+        employee.setCreationTimestamp(new Timestamp(System.currentTimeMillis()));
         employeeDao.save(employee);
         jdbcTemplate.update(query,employee.getEmpId());
     }
@@ -109,8 +112,9 @@ public class SuperAdminService
         }
     }
 
-    public List<String> registerNewEmployee(List<Employee> employee) {
-        List<String> invalidEmployeeList = new ArrayList<>();
+    public List<RegistrationResponse> registerNewEmployee(List<Employee> employee)
+    {
+        List<RegistrationResponse> invalidEmployeeList = new ArrayList<>();
         for (Employee emp:employee)
         {
             try
@@ -119,7 +123,10 @@ public class SuperAdminService
                 registerEmployee(emp);
             }
             catch (Exception e) {
-                invalidEmployeeList.add(emp.getEmpId()+" Not registered because "+e.getMessage());
+                RegistrationResponse response = new RegistrationResponse();
+                response.setEmpId(emp.getEmpId());
+                response.setReason(emp.getEmpId()+" Not registered because "+e.getMessage());
+                invalidEmployeeList.add(response);
             }
         }
         return invalidEmployeeList;
