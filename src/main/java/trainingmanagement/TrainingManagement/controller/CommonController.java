@@ -161,7 +161,7 @@ public class CommonController
     }
 
     @GetMapping("/employees/search")
-    @PreAuthorize("hasRole('admin') or hasRole('manager')")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('super_admin')")
     public ResponseEntity<?> getEmployeeListBySearchKey(Authentication authentication, @RequestParam String searchKey,@RequestParam int page, @RequestParam int limit)
     {
         String empId = authentication.getName();
