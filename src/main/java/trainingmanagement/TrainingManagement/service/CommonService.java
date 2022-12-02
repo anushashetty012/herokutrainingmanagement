@@ -130,7 +130,7 @@ public class CommonService
 
     public String getAttendeesAndNonAttendeesCount(int courseId,String empId)
     {
-        if(getRole((empId)).equalsIgnoreCase("admin") || getRole((empId)).equalsIgnoreCase("super_admin"))
+        if(getRole((empId)).equalsIgnoreCase("admin"))
         {
             String employeeCount = getAttendeesAndNonAttendeesForAdmin(courseId);
             return employeeCount;

@@ -23,7 +23,7 @@ public class EmployeeController
     EmployeeService employeeService;
 
     @GetMapping("count/acceptedInvites/{courseId}")
-    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee')")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee') or hasRole('super_admin')")
     public ResponseEntity<?> getAcceptedCount(@PathVariable int courseId,Authentication authentication)
     {
         int count = employeeService.getAcceptedCount(courseId,authentication.getName());

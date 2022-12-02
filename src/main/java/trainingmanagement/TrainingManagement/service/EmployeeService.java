@@ -38,7 +38,7 @@ public class EmployeeService
 
     public int getAcceptedCount(int courseId,String empId)
     {
-        if(getRole((empId)).equalsIgnoreCase("admin"))
+        if(getRole((empId)).equalsIgnoreCase("admin")|| getRole((empId)).equalsIgnoreCase("super_admin"))
         {
             return jdbcTemplate.queryForObject(GET_ACCEPTED_COUNT, new Object[]{courseId},Integer.class);
         }
