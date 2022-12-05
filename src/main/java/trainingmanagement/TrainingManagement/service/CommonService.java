@@ -13,11 +13,8 @@ import trainingmanagement.TrainingManagement.entity.Course;
 import trainingmanagement.TrainingManagement.entity.Employee;
 import trainingmanagement.TrainingManagement.entity.ManagersCourses;
 import trainingmanagement.TrainingManagement.request.FilterByDate;
-import trainingmanagement.TrainingManagement.response.CourseList;
-import trainingmanagement.TrainingManagement.response.EmployeeDetails;
-import trainingmanagement.TrainingManagement.response.EmployeeInvite;
+import trainingmanagement.TrainingManagement.response.*;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
-import trainingmanagement.TrainingManagement.response.EmployeeProfile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -711,5 +708,77 @@ public class CommonService
             map.put(filteredCourse.size(),filteredCourse);
             return map;
         }
+    }
+
+    public List<AttendedCourse> attendedCourseListForAdmin(String empId, int offset, int limit) throws EmployeeNotExistException {
+        checkEmployeeExist(empId);
+        List<AttendedCourse> attendedCourseList = jdbcTemplate.query("select Course.courseId,courseName,trainer,trainingMode,startDate,endDate from Course,AcceptedInvites where Course.courseId = AcceptedInvites.courseId and Course.completionStatus='completed' and AcceptedInvites.deleteStatus=false and Course.deleteStatus=false and AcceptedInvites.empId=? limit ?,?",(rs, rowNum) -> {
+            return new AttendedCourse(rs.getInt("courseId"),rs.getString("courseName"),rs.getString("trainer"),rs.getString("trainingMode"),rs.getDate("startDate"),rs.getDate("endDate"));
+        },empId,offset,limit);
+        return attendedCourseList;
+    }
+
+    public List<AttendedCourse> attendedCourseListForManager(String role,String empId, int offset, int limit) throws EmployeeNotUnderManagerException, EmployeeNotExistException {
+        checkEmployeeExist(empId);
+        fetchEmployeeForManager(empId,role);
+        List<AttendedCourse> attendedCourseList = jdbcTemplate.query("select Course.courseId,courseName,trainer,trainingMode,startDate,endDate from Course,AcceptedInvites where Course.courseId = AcceptedInvites.courseId and Course.completionStatus='completed' and AcceptedInvites.deleteStatus=false and Course.deleteStatus=false and AcceptedInvites.empId=? limit ?,?",(rs, rowNum) -> {
+            return new AttendedCourse(rs.getInt("courseId"),rs.getString("courseName"),rs.getString("trainer"),rs.getString("trainingMode"),rs.getDate("startDate"),rs.getDate("endDate"));
+        },empId,offset,limit);
+        return attendedCourseList;
+    }
+
+    public Map<Integer,List<AttendedCourse>> attendedCourse(String role,String empId, int page, int limit) throws EmployeeNotExistException, EmployeeNotUnderManagerException {
+
+        Map map = new HashMap<Integer, List>();
+        offset = limit * (page - 1);
+        List<AttendedCourse> attendedCourseList = new ArrayList<>();
+        if (getRole((role)).equalsIgnoreCase("admin")) {
+            attendedCourseList = attendedCourseListForAdmin(empId, offset, limit);
+        }
+        if (getRole((role)).equalsIgnoreCase("manager")) {
+            attendedCourseList = attendedCourseListForManager(role, empId, offset, limit);
+        }
+        if (attendedCourseList.size() != 0) {
+            map.put(attendedCourseList.size(), attendedCourseList);
+            return map;
+        }
+        return null;
+    }
+
+    public List<NonAttendedCourse> nonAttendedCourseListForAdmin(String empId, int offset, int limit) throws EmployeeNotExistException {
+        checkEmployeeExist(empId);
+        List<NonAttendedCourse> nonAttendedCourseList = jdbcTemplate.query("select Course.courseId,courseName,trainer,trainingMode,startDate,endDate,reason from Course,RejectedInvites where Course.courseId = RejectedInvites.courseId and Course.deleteStatus=false and Course.completionStatus='completed' and RejectedInvites.empId=? limit ?,?",(rs, rowNum) -> {
+            return new NonAttendedCourse(rs.getInt("courseId"),rs.getString("courseName"),rs.getString("trainer"),rs.getString("trainingMode"),rs.getDate("startDate"),rs.getDate("endDate"),rs.getString("reason"));
+        },empId,offset,limit);
+        return nonAttendedCourseList;
+    }
+
+    public List<NonAttendedCourse> nonAttendedCourseListForManager(String role,String empId, int offset, int limit) throws EmployeeNotUnderManagerException, EmployeeNotExistException {
+        checkEmployeeExist(empId);
+        fetchEmployeeForManager(empId,role);
+        List<NonAttendedCourse> nonAttendedCourseList = jdbcTemplate.query("select Course.courseId,courseName,trainer,trainingMode,startDate,endDate,reason from Course,RejectedInvites where Course.courseId = RejectedInvites.courseId and Course.deleteStatus=false and Course.completionStatus='completed' and RejectedInvites.empId=? limit ?,?",(rs, rowNum) -> {
+            return new NonAttendedCourse(rs.getInt("courseId"),rs.getString("courseName"),rs.getString("trainer"),rs.getString("trainingMode"),rs.getDate("startDate"),rs.getDate("endDate"),rs.getString("reason"));
+        },empId,offset,limit);
+        return nonAttendedCourseList;
+    }
+
+    public Map<Integer,List<NonAttendedCourse>> nonAttendedCourse(String role,String empId, int page, int limit) throws EmployeeNotExistException, EmployeeNotUnderManagerException {
+        Map map = new HashMap<Integer, List>();
+        offset = limit * (page - 1);
+        List<NonAttendedCourse> nonAttendedCourseList = new ArrayList<>();
+        if (getRole((role)).equalsIgnoreCase("admin"))
+        {
+            nonAttendedCourseList = nonAttendedCourseListForAdmin(empId, offset, limit);
+        }
+        if (getRole((role)).equalsIgnoreCase("manager"))
+        {
+            nonAttendedCourseList = nonAttendedCourseListForManager(role, empId, offset, limit);
+        }
+        if (nonAttendedCourseList.size() != 0)
+        {
+            map.put(nonAttendedCourseList.size(), nonAttendedCourseList);
+            return map;
+        }
+        return null;
     }
 }

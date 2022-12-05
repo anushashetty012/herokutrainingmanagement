@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import trainingmanagement.TrainingManagement.customException.CourseInfoIntegrityException;
 import trainingmanagement.TrainingManagement.customException.EmployeeNotExistException;
@@ -12,9 +13,7 @@ import trainingmanagement.TrainingManagement.customException.SuperAdminIdExcepti
 import trainingmanagement.TrainingManagement.entity.Course;
 import trainingmanagement.TrainingManagement.request.ManagerEmployees;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
-import trainingmanagement.TrainingManagement.response.CourseList;
-import trainingmanagement.TrainingManagement.response.EmployeeInfo;
-import trainingmanagement.TrainingManagement.response.EmployeesToManager;
+import trainingmanagement.TrainingManagement.response.*;
 import trainingmanagement.TrainingManagement.service.AdminService;
 
 import java.util.List;

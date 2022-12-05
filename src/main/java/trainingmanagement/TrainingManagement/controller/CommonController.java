@@ -7,13 +7,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import trainingmanagement.TrainingManagement.customException.CourseNotValidException;
+import trainingmanagement.TrainingManagement.customException.EmployeeNotExistException;
+import trainingmanagement.TrainingManagement.customException.EmployeeNotUnderManagerException;
 import trainingmanagement.TrainingManagement.entity.Course;
 import trainingmanagement.TrainingManagement.request.FilterByDate;
-import trainingmanagement.TrainingManagement.response.CourseList;
-import trainingmanagement.TrainingManagement.response.EmployeeDetails;
-import trainingmanagement.TrainingManagement.response.EmployeeInvite;
+import trainingmanagement.TrainingManagement.response.*;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
-import trainingmanagement.TrainingManagement.response.EmployeeProfile;
 import trainingmanagement.TrainingManagement.service.CommonService;
 import java.util.List;
 import java.util.Map;
@@ -184,6 +183,45 @@ public class CommonController
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.of(Optional.of(filteredCourseList));
+    }
+
+    @GetMapping("/attendedCourse")
+    @PreAuthorize("hasRole('admin') or hasRole('manager')")
+    public ResponseEntity<?> attendedCourses(Authentication authentication,@RequestParam String empId, @RequestParam int page, @RequestParam int limit)
+    {
+        Map<Integer,List<AttendedCourse>> attendedNonAttendedCourses;
+        try
+        {
+            attendedNonAttendedCourses = commonService.attendedCourse(authentication.getName(), empId, page, limit);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+        if (attendedNonAttendedCourses == null)
+        {
+            return new ResponseEntity<>("Employee has not attended any course", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.of(Optional.of(attendedNonAttendedCourses));
+    }
+
+    @GetMapping("/nonAttendedCourse")
+    @PreAuthorize("hasRole('admin') or hasRole('manager')")
+    public ResponseEntity<?> NonAttendedCourses(Authentication authentication,@RequestParam String empId, @RequestParam int page, @RequestParam int limit)
+    {
+        Map<Integer,List<NonAttendedCourse>> nonAttendedNonAttendedCourses;
+        try {
+            nonAttendedNonAttendedCourses = commonService.nonAttendedCourse(authentication.getName(), empId, page, limit);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+        if (nonAttendedNonAttendedCourses == null)
+        {
+            return new ResponseEntity<>("Employee do not have any courses", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.of(Optional.of(nonAttendedNonAttendedCourses));
     }
 }
 

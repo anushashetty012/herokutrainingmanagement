@@ -12,9 +12,7 @@ import trainingmanagement.TrainingManagement.entity.Course;
 import trainingmanagement.TrainingManagement.entity.ManagersCourses;
 import trainingmanagement.TrainingManagement.request.ManagerEmployees;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
-import trainingmanagement.TrainingManagement.response.CourseList;
-import trainingmanagement.TrainingManagement.response.EmployeeInfo;
-import trainingmanagement.TrainingManagement.response.EmployeesToManager;
+import trainingmanagement.TrainingManagement.response.*;
 
 import java.sql.Date;
 import java.sql.Time;
