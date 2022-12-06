@@ -29,7 +29,7 @@ public class EmployeeController
         int count = employeeService.getAcceptedCount(courseId,authentication.getName());
         if (count == 0)
         {
-            return new ResponseEntity<>("There are no attendees to this course or this course is not allocated to you",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("There are no attendees to this course or this course is not allocated to you",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(count));
     }
@@ -89,7 +89,7 @@ public class EmployeeController
         Map<Integer,List<AttendedCourse>> attendedNonAttendedCourses = employeeService.attendedCourse(authentication.getName(),page, limit);
         if (attendedNonAttendedCourses == null)
         {
-            return new ResponseEntity<>("You did not attend any course or there are no more course", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("You did not attend any course or there are no more course", HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(attendedNonAttendedCourses));
     }
@@ -101,7 +101,7 @@ public class EmployeeController
         Map<Integer,List<NonAttendedCourse>> nonAttendedNonAttendedCourses = employeeService.nonAttendedCourse(authentication.getName(), page, limit);
         if (nonAttendedNonAttendedCourses == null)
         {
-            return new ResponseEntity<>("you do not have any courses", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("you do not have any courses", HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(nonAttendedNonAttendedCourses));
     }
@@ -114,7 +114,7 @@ public class EmployeeController
         Map<Integer,List<Course>> courseList = employeeService.filterCourse(filter,empId,page,limit);
         if(courseList == null)
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No "+filter.getCompletionStatus()+" course between the range");
+            return ResponseEntity.status(HttpStatus.OK).body("No "+filter.getCompletionStatus()+" course between the range");
         }
         return ResponseEntity.of(Optional.of(courseList));
     }
@@ -135,7 +135,7 @@ public class EmployeeController
         Map<Integer,List<Course>> courseList = employeeService.coursesForEmployeeByCompletedStatus(empId,completionStatus,page,limit);
         if(courseList == null)
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No "+ completionStatus+" course");
+            return ResponseEntity.status(HttpStatus.OK).body("No "+ completionStatus+" course");
         }
         return ResponseEntity.of(Optional.of(courseList));
     }

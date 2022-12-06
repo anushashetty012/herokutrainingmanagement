@@ -31,7 +31,7 @@ public class CommonController
         int count = commonService.getCourseCountByStatus(completionStatus);
         if (count == 0)
         {
-            return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(count));
     }
@@ -44,7 +44,7 @@ public class CommonController
         Map<Integer,List<CourseList>> courses = commonService.getCourse(completionStatus,page,limit);
         if (courses == null)
         {
-            return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No "+completionStatus+" course in the company",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(courses));
     }
@@ -68,7 +68,7 @@ public class CommonController
         Map<Integer,List<EmployeeProfile>> employee = commonService.getAttendingEmployee(courseId,authentication.getName(),page,limit);
         if (employee==null)
         {
-            return new ResponseEntity<>("This course is not allocated to you or there are no attendees for this course",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("This course is not allocated to you or there are no attendees for this course",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(employee));
     }
@@ -80,7 +80,7 @@ public class CommonController
         Map<Integer,List<EmployeeProfile>> employee = commonService.getNonAttendingEmployee(courseId,authentication.getName(),page,limit);
         if (employee == null)
         {
-            return new ResponseEntity<>("This course is not allocated to you or there are no non-attendees for this course",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("This course is not allocated to you or there are no non-attendees for this course",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(employee));
     }
@@ -101,7 +101,7 @@ public class CommonController
         }
         if (employeeList == null)
         {
-            return new ResponseEntity<>("There are no employees who are not invited or You cannot invite employees for this course",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("There are no employees who are not invited or You cannot invite employees for this course",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(employeeList));
     }
@@ -154,7 +154,7 @@ public class CommonController
         Map<Integer,List<EmployeeDetails>> empData = commonService.employeeDetails(empId,page,limit);
         if (empData.size() == 0)
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No employees found");
+            return ResponseEntity.status(HttpStatus.OK).body("No employees found");
         }
         return ResponseEntity.of(Optional.of(empData));
     }
@@ -167,7 +167,7 @@ public class CommonController
         Map<Integer,List<EmployeeDetails>> empData = commonService.employeeDetailsBySearchKey(empId,searchKey,page,limit);
         if (empData.size() == 0)
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No employees found");
+            return ResponseEntity.status(HttpStatus.OK).body("No employees found");
         }
         return ResponseEntity.of(Optional.of(empData));
     }
@@ -180,7 +180,7 @@ public class CommonController
         Map<Integer,List<Course>> filteredCourseList = commonService.filteredCourses(empID,filter,page,limit);
         if (filteredCourseList.size() == 0)
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.OK).body("No course found");
         }
         return ResponseEntity.of(Optional.of(filteredCourseList));
     }
@@ -200,7 +200,7 @@ public class CommonController
         }
         if (attendedNonAttendedCourses == null)
         {
-            return new ResponseEntity<>("Employee has not attended any course", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Employee has not attended any course", HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(attendedNonAttendedCourses));
     }
@@ -219,7 +219,7 @@ public class CommonController
         }
         if (nonAttendedNonAttendedCourses == null)
         {
-            return new ResponseEntity<>("Employee do not have any courses", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Employee do not have any courses", HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(nonAttendedNonAttendedCourses));
     }
