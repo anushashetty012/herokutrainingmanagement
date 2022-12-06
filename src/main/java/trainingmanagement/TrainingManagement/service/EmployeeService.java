@@ -71,7 +71,7 @@ public class EmployeeService
 
     public CourseInfo viewCourseDetails(int courseId, String empId)
     {
-        if(getRole((empId)).equalsIgnoreCase("admin"))
+        if(getRole((empId)).equalsIgnoreCase("admin") || getRole((empId)).equalsIgnoreCase("super_admin"))
         {
             try
             {

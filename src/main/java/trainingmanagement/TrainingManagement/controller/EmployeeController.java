@@ -35,7 +35,7 @@ public class EmployeeController
     }
 
     @GetMapping("/courseDetails/{courseId}")
-    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee')")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee') or hasRole('super_admin')")
     public ResponseEntity<?> viewCourseDetails(@PathVariable int courseId,Authentication authentication)
     {
         CourseInfo courseData = employeeService.viewCourseDetails(courseId,authentication.getName());
