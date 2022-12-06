@@ -27,9 +27,9 @@ public class EmployeeController
     public ResponseEntity<?> getAcceptedCount(@PathVariable int courseId,Authentication authentication)
     {
         int count = employeeService.getAcceptedCount(courseId,authentication.getName());
-        if (count == 0)
+        if (count == -1)
         {
-            return new ResponseEntity<>("There are no attendees to this course or this course is not allocated to you",HttpStatus.OK);
+            return new ResponseEntity<>("This course is not allocated to you",HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.of(Optional.of(count));
     }

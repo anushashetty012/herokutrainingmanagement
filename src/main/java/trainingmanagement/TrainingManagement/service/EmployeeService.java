@@ -66,7 +66,7 @@ public class EmployeeService
                 return jdbcTemplate.queryForObject(GET_ACCEPTED_COUNT, new Object[]{courseId},Integer.class);
             }
         }
-        return 0;
+        return -1;
     }
 
     public CourseInfo viewCourseDetails(int courseId, String empId)
