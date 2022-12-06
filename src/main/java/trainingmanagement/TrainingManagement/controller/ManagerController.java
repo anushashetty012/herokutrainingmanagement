@@ -28,7 +28,7 @@ public class ManagerController
         Map<Integer,List<Course>> courseList = managerService.getAssignedCoursesForManagerByStatus(empId,completionStatus,page,limit);
         if(courseList == null)
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No "+completionStatus+" course");
+            return ResponseEntity.status(HttpStatus.OK).body("No "+completionStatus+" course");
         }
         return ResponseEntity.of(Optional.of(courseList));
     }

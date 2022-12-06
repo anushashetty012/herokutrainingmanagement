@@ -53,7 +53,7 @@ public class AdminController
         Map<Integer,List<CourseList>> courseList = adminRepository.getCourseToAssignManager(page,limit);
         if (courseList == null)
         {
-            return new ResponseEntity<>("No more upcoming course in the company, create a course to assign to manager",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No more upcoming course in the company, create a course to assign to manager",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(courseList));
     }
@@ -66,7 +66,7 @@ public class AdminController
         Map<Integer,List<EmployeeInfo>> managers = adminRepository.getManagers(page,limit);
         if (managers == null)
         {
-            return new ResponseEntity<>("No more managers in the company",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No more managers in the company",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(managers));
     }
@@ -79,7 +79,7 @@ public class AdminController
         Map<Integer,List<EmployeeInfo>> managers = adminRepository.getManagersBySearchkey(page,limit,searchKey);
         if (managers == null)
         {
-            return new ResponseEntity<>("No match found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No match found",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(managers));
     }
@@ -99,7 +99,7 @@ public class AdminController
         }
         if (managers == null)
         {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No managers found");
+            return ResponseEntity.status(HttpStatus.OK).body("No managers found");
         }
         return ResponseEntity.of(Optional.of(managers));
     }
@@ -111,7 +111,7 @@ public class AdminController
         Map<Integer,List<EmployeeInfo>> managers = adminRepository.getManagersToAssignCourseBySearchkey(courseId,page,limit,searchKey);
         if (managers == null)
         {
-            return new ResponseEntity<>("No match found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No match found",HttpStatus.OK);
         }
         return ResponseEntity.of(Optional.of(managers));
     }
@@ -167,7 +167,7 @@ public class AdminController
         }
         if (employees == null)
         {
-            return new ResponseEntity<>("No employees found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No employees found",HttpStatus.OK);
         }
         return ResponseEntity.status(HttpStatus.OK).body(employees);
     }
