@@ -133,7 +133,7 @@ public class AdminController
         return ResponseEntity.of(Optional.of(assignStatus));
     }
 
-    @PatchMapping("/update/course")
+    @PutMapping("/update/course")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<?> updateCourse(@RequestBody Course course){
         int updatedCourse = 0;
