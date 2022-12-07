@@ -173,7 +173,7 @@ public class CommonController
     }
 
     @GetMapping("/course/filter")
-    @PreAuthorize("hasRole('admin') or hasRole('manager')")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('super_admin')")
     public ResponseEntity<?> filterCourse(Authentication authentication, @ModelAttribute FilterByDate filter,@RequestParam int page, @RequestParam int limit){
         String empID = authentication.getName();
 

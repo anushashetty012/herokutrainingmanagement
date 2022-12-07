@@ -680,7 +680,7 @@ public class CommonService
         Map map = new HashMap<Integer,List>();
         offset = limit *(page-1);
         String role = getRole(empId);
-        if(role.equals("admin") )
+        if(role.equals("admin") || role.equals("super_admin"))
         {
             List<Course> filteredCourse=null;
             if (filter.getCompletionStatus().matches("active|upcoming"))
