@@ -160,7 +160,14 @@ public class EmployeeController
     @PutMapping("/uploadProfilePhoto")
     public ResponseEntity<?> uploadIProfile(@RequestParam("file") MultipartFile file, Authentication authentication)
     {
-        String uploadMessage = employeeService.uploadProfilePhoto(file,authentication.getName());
+        String uploadMessage;
+        try
+        {
+            uploadMessage = employeeService.uploadProfilePhoto(file,authentication.getName());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload profile photo");
+        }
+        //String uploadMessage = employeeService.uploadProfilePhoto(file,authentication.getName());
         if (uploadMessage == null)
         {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload profile photo");
