@@ -327,7 +327,7 @@ public class EmployeeService
     }
 
     //profile photo upload
-    public String uploadProfilePhoto(MultipartFile profilePhoto,String empId)
+    public PhotoUploadResponse uploadProfilePhoto(MultipartFile profilePhoto,String empId)
     {
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", "do52xyv54",
@@ -346,8 +346,14 @@ public class EmployeeService
             );
             Map uploadResult = cloudinary.uploader().upload(profilePhoto.getBytes(), params1);
             String url = uploadResult.get("secure_url").toString();
-            jdbcTemplate.update("update employee set profile_pic=? where emp_id=?",url,empId);
-            return "Profile photo uploaded successfully";
+            int uploadStatus = jdbcTemplate.update("update employee set profile_pic=? where emp_id=?",url,empId);
+            PhotoUploadResponse photoUploadResponse = new PhotoUploadResponse();
+            if (uploadStatus == 1)
+            {
+                photoUploadResponse.setUrl(url);
+                photoUploadResponse.setMessage("Profile photo uploaded successfully");
+            }
+            return photoUploadResponse;
         }
         catch (Exception e)
         {
