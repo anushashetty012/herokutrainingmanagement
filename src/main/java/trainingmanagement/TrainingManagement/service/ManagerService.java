@@ -32,5 +32,12 @@ public class ManagerService
         }
         return null;
     }
+
+    public int getCourseCountForManagerByStatus(String managerId, String completionStatus)
+    {
+        String query = "select count(ManagersCourses.courseId) from ManagersCourses, Course where ManagersCourses.courseId = Course.courseId " +
+                "and Course.completionStatus = ? and managerId = ? and Course.deleteStatus=false" ;
+        return jdbcTemplate.queryForObject(query, Integer.class,completionStatus,managerId);
+    }
 }
 

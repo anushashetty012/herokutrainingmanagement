@@ -32,4 +32,13 @@ public class ManagerController
         }
         return ResponseEntity.of(Optional.of(courseList));
     }
+
+    @GetMapping("/assignedCourses/count/{completionStatus}")
+    @PreAuthorize("hasRole('manager')")
+    public ResponseEntity<?> getCourseCountForManagerByStatus(Authentication authentication, @PathVariable String completionStatus)
+    {
+        String empId = authentication.getName();
+        int count  = managerService.getCourseCountForManagerByStatus(empId,completionStatus);
+        return ResponseEntity.of(Optional.of(count));
+    }
 }
