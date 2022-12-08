@@ -199,4 +199,19 @@ public class AdminController
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @PutMapping("/delete/reportees")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<String> deleteReportees(@RequestBody ManagerEmployees managerEmployees)
+    {
+        try
+        {
+            adminRepository.removeReportee(managerEmployees);
+            return ResponseEntity.status(HttpStatus.OK).body("Deleted reportees successfully");
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }

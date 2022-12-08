@@ -322,6 +322,75 @@ public class CommonService
         }
         return null;
     }
+    public List<EmployeeInvite> searchEmployeesToInviteForAdmin(int courseId,String searchKey)
+    {
+        List<EmployeeInvite> employeeList;
+        List<EmployeeInvite> employeeList1;
+        List<EmployeeInvite> employeeList2= new ArrayList<>();
+        String query = "SELECT emp_id,emp_name,designation FROM employee,Invites WHERE employee.emp_id<>'RT001' and employee.emp_id=Invites.empId and courseId=? and (employee.emp_id = ? or emp_name like ? or designation like ?) and (acceptanceStatus=true or acceptanceStatus is null) and delete_status=false";
+        employeeList= jdbcTemplate.query(query,(rs, rowNum) -> {
+            return new EmployeeInvite(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),true);
+        },courseId,searchKey,"%"+searchKey+"%","%"+searchKey+"%");
+
+        //Employees who rejected the invites and employees who are not invited
+        String query1 = "SELECT emp_id,emp_name,designation FROM employee WHERE employee.emp_id<>'RT001' and (employee.emp_id = ? or emp_name like ? or designation like ?) and employee.emp_id NOT IN (SELECT Invites.empId FROM Invites WHERE courseId=? and (acceptanceStatus=true or acceptanceStatus is null)) and delete_status=false";
+        employeeList1 = jdbcTemplate.query(query1,(rs, rowNum) -> {
+            return new EmployeeInvite(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),false);
+        },courseId,searchKey,"%"+searchKey+"%","%"+searchKey+"%");
+        employeeList2.addAll(employeeList);
+        employeeList2.addAll(employeeList1);
+        return employeeList2;
+    }
+
+    public List<EmployeeInvite> searchEmployeesToInviteForManager(int courseId,String searchKey,String empId)
+    {
+        List<EmployeeInvite> employeeList;
+        List<EmployeeInvite> employeeList1;
+        List<EmployeeInvite> employeeList2= new ArrayList<>();
+        try
+        {
+            List<ManagersCourses> isCourseAssigned = jdbcTemplate.query(CHECK_COURSE_ALLOCATION, (rs, rowNum) -> {
+                return new ManagersCourses(rs.getInt("courseId"));
+            }, empId, courseId);
+            if (isCourseAssigned.size() != 0 )
+            {
+                String query = "SELECT emp_id,emp_name,designation FROM employee,Manager,Invites WHERE employee.emp_id=Manager.empId and Manager.managerId=? and employee.emp_id<>'RT001' and employee.emp_id=Invites.empId and courseId=? and (employee.emp_id = ? or emp_name like ? or designation like ?) and (acceptanceStatus=true or acceptanceStatus is null) and delete_status=false";
+                employeeList= jdbcTemplate.query(query,(rs, rowNum) -> {
+                    return new EmployeeInvite(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),true);
+                },empId,courseId,searchKey,"%"+searchKey+"%","%"+searchKey+"%");
+
+                //Employees who rejected the invites and employees who are not invited
+                String query1 = "SELECT emp_id,emp_name,designation FROM employee,Manager WHERE employee.emp_id=Manager.empId and Manager.managerId=? and employee.emp_id<>'RT001' " +
+                        "and (employee.emp_id = ? or emp_name like ? or designation like ?)"+
+                        "and employee.emp_id NOT IN (SELECT Invites.empId FROM Invites WHERE courseId=? and (acceptanceStatus=true or acceptanceStatus is null)) " +
+                        "and delete_status=false";
+                employeeList1 = jdbcTemplate.query(query1,(rs, rowNum) -> {
+                    return new EmployeeInvite(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),false);
+                },empId,searchKey,"%"+searchKey+"%","%"+searchKey+"%",courseId);
+                employeeList2.addAll(employeeList);
+                employeeList2.addAll(employeeList1);
+                return employeeList2;
+            }
+        }
+        catch (DataAccessException e)
+        {
+            return null;
+        }
+        return null;
+    }
+
+    public List<EmployeeInvite> searchEmployeesToInvite(int courseId,String empId,String searchKey)
+    {
+        if(getRole((empId)).equalsIgnoreCase("admin"))
+        {
+            return searchEmployeesToInviteForAdmin(courseId,searchKey);
+        }
+        if (getRole((empId)).equalsIgnoreCase("manager"))
+        {
+            return searchEmployeesToInviteForManager(courseId,searchKey,empId);
+        }
+        return null;
+    }
 
     public void isCourseIdValid(int courseId) throws CourseNotValidException
     {

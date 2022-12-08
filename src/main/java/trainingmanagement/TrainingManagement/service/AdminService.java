@@ -600,4 +600,58 @@ public class AdminService
             return "completed";
         }
     }
+
+    //to delete reportees
+    public void checkManagerValidity(String managerId) throws EmployeeNotExistException, ManagerNotExistException, SuperAdminIdException {
+        checkEmployeeExist(managerId);
+        checkManagerExist(managerId);
+        isSuperAdminId(managerId);
+    }
+    public void checkEmployeeUnderManager(ManagerEmployees managerEmployees) throws EmployeeNotUnderManagerException
+    {
+        for (String emp:managerEmployees.getEmpId())
+        {
+            fetchEmployeeForManager(emp,managerEmployees.getManagerId());
+        }
+    }
+    public void fetchEmployeeForManager(String empId, String managerId) throws EmployeeNotUnderManagerException
+    {
+        String query = "select empId from Manager,employee where employee.emp_id = Manager.empId and Manager.managerId=? and employee.emp_id=? and employee.delete_status=0";
+        try
+        {
+            jdbcTemplate.queryForObject(query, String.class,managerId,empId);
+        }
+        catch (DataAccessException e) {
+            throw new EmployeeNotUnderManagerException("Employee not under manager");
+        }
+    }
+
+    public void removeEmployeeFromManger(ManagerEmployees managerEmployees)
+    {
+        for (String emp: managerEmployees.getEmpId())
+        {
+            deleteReportees(emp,managerEmployees.getManagerId());
+        }
+    }
+    public void deleteReportees(String empId,String managerId)
+    {
+        String query="update Manager set managerId=null where empId=? and managerId=?";
+        try
+        {
+            jdbcTemplate.update(query,empId,managerId);
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void removeReportee(ManagerEmployees managerEmployees) throws ManagerNotExistException, EmployeeNotExistException, SuperAdminIdException, ManagerEmployeeSameException, EmployeeNotUnderManagerException {
+        //check managervalidity
+        checkManagerValidity(managerEmployees.getManagerId());
+        //check employeeListVAlid
+        checkValidityOfEmployeesList(managerEmployees);
+        //check employees exist under manager
+        checkEmployeeUnderManager(managerEmployees);
+        //then set empId =null
+        removeEmployeeFromManger(managerEmployees);
+    }
 }

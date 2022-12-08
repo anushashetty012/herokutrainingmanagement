@@ -106,6 +106,20 @@ public class CommonController
         return ResponseEntity.of(Optional.of(employeeList));
     }
 
+    @GetMapping("/employees/search/{courseId}")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('super_admin')")
+    public ResponseEntity<?> getEmployeesToInviteBySearchKey(Authentication authentication,@PathVariable int courseId, @RequestParam String searchKey)
+    {
+        String empId = authentication.getName();
+        List<EmployeeInvite> employeeList;
+        employeeList = commonService.searchEmployeesToInvite(courseId,empId,searchKey);
+        if (employeeList == null)
+        {
+            return ResponseEntity.status(HttpStatus.OK).body("No match found");
+        }
+        return ResponseEntity.of(Optional.of(employeeList));
+    }
+
     @PostMapping("/invite/{courseId}")
     @PreAuthorize("hasRole('admin') or hasRole('manager')")
     public ResponseEntity<String> inviteEmployee(@PathVariable int courseId, @RequestBody List<MultipleEmployeeRequest> inviteToEmployees,Authentication authentication) throws CourseNotValidException {
