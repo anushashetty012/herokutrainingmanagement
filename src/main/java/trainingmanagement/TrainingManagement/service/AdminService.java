@@ -76,15 +76,25 @@ public class AdminService
         return null;
     }
 
-    public Map<Integer,List<EmployeeInfo>> getManagersToAssignCourse(int courseId, int page, int limit) throws CourseDeletionException
+    public List<ManagerInfo> getManagersAssignedToCourse(int courseId, int offset, int limit) throws CourseDeletionException
+    {
+        String query = "SELECT employee.emp_Id,emp_Name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and employee_role.emp_id in (select managerId from ManagersCourses where courseId=?) LIMIT ?,?";
+        List<ManagerInfo> employeeDetails =  jdbcTemplate.query(query,(rs, rowNum) -> {
+            return new ManagerInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),true);
+        },courseId,offset,limit);
+       return employeeDetails;
+    }
+
+    public Map<Integer,List<ManagerInfo>> getManagersToAssignCourse(int courseId, int page, int limit) throws CourseDeletionException
     {
         isCourseExist(courseId,false);
         Map map = new HashMap<Integer,List>();
         offset = limit *(page-1);
         String query = "SELECT employee.emp_Id,emp_Name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and employee_role.emp_id not in (select managerId from ManagersCourses where courseId=?) LIMIT ?,?";
-        List<EmployeeInfo> employeeDetails =  jdbcTemplate.query(query,(rs, rowNum) -> {
-            return new EmployeeInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"));
+        List<ManagerInfo> employeeDetails =  jdbcTemplate.query(query,(rs, rowNum) -> {
+            return new ManagerInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),false);
         },courseId,offset,limit);
+        employeeDetails.addAll(getManagersAssignedToCourse(courseId,offset,limit));
         if (employeeDetails.size() != 0)
         {
             map.put(employeeDetails.size(),employeeDetails);
@@ -93,14 +103,24 @@ public class AdminService
         return null;
     }
 
-    public Map<Integer,List<EmployeeInfo>> getManagersToAssignCourseBySearchkey(int courseId,int page, int limit, String searchKey)
+    public List<ManagerInfo> getManagersAssignedToCourseBySearchkey(int courseId,int offset, int limit, String searchKey)
+    {
+        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?) and employee_role.emp_id in (select managerId from ManagersCourses where courseId=?) LIMIT ?,?";
+        List<ManagerInfo> employeeDetails =  jdbcTemplate.query(GET_MANAGERS,(rs, rowNum) -> {
+            return new ManagerInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),true);
+        },searchKey,"%"+searchKey+"%","%"+searchKey+"%",courseId,offset,limit);
+       return  employeeDetails;
+    }
+
+    public Map<Integer,List<ManagerInfo>> getManagersToAssignCourseBySearchkey(int courseId,int page, int limit, String searchKey)
     {
         String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?) and employee_role.emp_id not in (select managerId from ManagersCourses where courseId=?) LIMIT ?,?";
         Map map = new HashMap<Integer,List>();
         offset = limit *(page-1);
-        List<EmployeeInfo> employeeDetails =  jdbcTemplate.query(GET_MANAGERS,(rs, rowNum) -> {
-            return new EmployeeInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"));
+        List<ManagerInfo> employeeDetails =  jdbcTemplate.query(GET_MANAGERS,(rs, rowNum) -> {
+            return new ManagerInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),false);
         },searchKey,"%"+searchKey+"%","%"+searchKey+"%",courseId,offset,limit);
+        employeeDetails.addAll(getManagersAssignedToCourseBySearchkey(courseId,offset,limit,searchKey));
         if (employeeDetails.size() != 0)
         {
             map.put(employeeDetails.size(),employeeDetails);
@@ -408,6 +428,17 @@ public class AdminService
             throw new CourseInfoIntegrityException("Training mode is not valid");
         }
     }
+    public void assignStatusToEmployeeToManagerList(List<EmployeesToManager> employeesToManagerList,String managerId)
+    {
+        for (EmployeesToManager emp:employeesToManagerList)
+        {
+            if (emp.getManagerId() != null && emp.getManagerId().equals(managerId))
+            {
+                emp.setStatus(true);
+            }
+        }
+    }
+
     public Map<Integer,List<EmployeesToManager>> employeesToAssignManager(String managerId, int page, int limit) throws EmployeeNotExistException, ManagerNotExistException, SuperAdminIdException {
         checkEmployeeExist(managerId);
         checkManagerExist(managerId);
@@ -415,9 +446,9 @@ public class AdminService
         Map map = new HashMap<Integer,List>();
         offset = limit *(page-1);
         String query = "select employee.emp_id, emp_name, designation, managerId from employee, Manager \n" +
-                "where employee.emp_id=Manager.empId and employee.emp_id<>'RT001' and employee.emp_id<>? and employee.delete_status=false\n" +
-                "and employee.emp_id not in (select empId from Manager where managerId=?) limit ?,?";
-        List<EmployeesToManager> employeeDetails =  jdbcTemplate.query(query,new BeanPropertyRowMapper<EmployeesToManager>(EmployeesToManager.class),managerId,managerId,offset,limit);
+                "where employee.emp_id=Manager.empId and employee.emp_id<>'RT001' and employee.emp_id<>? and employee.delete_status=false limit ?,?";
+        List<EmployeesToManager> employeeDetails =  jdbcTemplate.query(query,new BeanPropertyRowMapper<EmployeesToManager>(EmployeesToManager.class),managerId,offset,limit);
+        assignStatusToEmployeeToManagerList(employeeDetails,managerId);
         if (employeeDetails.size() != 0)
         {
             map.put(employeeDetails.size(),employeeDetails);

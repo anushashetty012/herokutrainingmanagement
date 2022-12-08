@@ -1,13 +1,16 @@
 package trainingmanagement.TrainingManagement.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class EmployeesToManager
+@AllArgsConstructor
+@NoArgsConstructor
+public class ManagerInfo
 {
     private String empId;
     private String empName;
     private String designation;
-    private String managerId;
-    private boolean status;
+    private boolean status = false;
 }

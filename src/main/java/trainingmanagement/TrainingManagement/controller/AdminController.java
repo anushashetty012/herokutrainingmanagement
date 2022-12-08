@@ -88,7 +88,7 @@ public class AdminController
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<?> getManagersToAssignCourse(@PathVariable int courseId, @RequestParam int page, @RequestParam int limit)
     {
-        Map<Integer,List<EmployeeInfo>> managers;
+        Map<Integer,List<ManagerInfo>> managers;
         try
         {
             managers = adminRepository.getManagersToAssignCourse(courseId,page,limit);
@@ -108,7 +108,7 @@ public class AdminController
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<?> getManagersToAssignCourseBySearchKey(@PathVariable int courseId,@RequestParam int page, @RequestParam int limit,@RequestParam String searchKey)
     {
-        Map<Integer,List<EmployeeInfo>> managers = adminRepository.getManagersToAssignCourseBySearchkey(courseId,page,limit,searchKey);
+        Map<Integer,List<ManagerInfo>> managers = adminRepository.getManagersToAssignCourseBySearchkey(courseId,page,limit,searchKey);
         if (managers == null)
         {
             return new ResponseEntity<>("No match found",HttpStatus.OK);

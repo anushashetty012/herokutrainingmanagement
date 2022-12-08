@@ -209,6 +209,7 @@ public class SuperAdminService
             deleteFromEmployeeRoleOnEmpDelete(emp.getEmpId());
             deleteFromInvitesOnEmpDelete(emp.getEmpId());
             deleteFromAcceptedInvitesOnEmpDelete(emp.getEmpId());
+            setNullInManagerTable(emp.getEmpId());
         }
     }
     public void deleteFromEmployeeRoleOnEmpDelete(String empId)
@@ -226,6 +227,12 @@ public class SuperAdminService
     public void deleteFromAcceptedInvitesOnEmpDelete(String empId)
     {
         String query = "delete from AcceptedInvites where empId=? and courseId in(select courseId from Course where completionStatus='upcoming')";
+        jdbcTemplate.update(query,empId);
+    }
+
+    public void setNullInManagerTable(String empId)
+    {
+        String query =  "update Manager set managerId=null where managerId=?";
         jdbcTemplate.update(query,empId);
     }
 
