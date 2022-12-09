@@ -7,8 +7,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import trainingmanagement.TrainingManagement.customException.CourseNotValidException;
-import trainingmanagement.TrainingManagement.customException.EmployeeNotExistException;
-import trainingmanagement.TrainingManagement.customException.EmployeeNotUnderManagerException;
 import trainingmanagement.TrainingManagement.entity.Course;
 import trainingmanagement.TrainingManagement.request.FilterByDate;
 import trainingmanagement.TrainingManagement.response.*;

@@ -9,7 +9,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Repository;
 import trainingmanagement.TrainingManagement.customException.*;
 import trainingmanagement.TrainingManagement.entity.Course;
-import trainingmanagement.TrainingManagement.entity.ManagersCourses;
 import trainingmanagement.TrainingManagement.request.ManagerEmployees;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
 import trainingmanagement.TrainingManagement.response.*;

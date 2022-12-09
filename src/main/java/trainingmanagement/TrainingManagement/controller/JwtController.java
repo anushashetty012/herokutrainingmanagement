@@ -1,7 +1,6 @@
 package trainingmanagement.TrainingManagement.controller;
 
 
-import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;

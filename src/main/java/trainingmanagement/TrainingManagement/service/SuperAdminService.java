@@ -2,7 +2,6 @@ package trainingmanagement.TrainingManagement.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -19,13 +18,10 @@ import trainingmanagement.TrainingManagement.entity.Employee;
 import trainingmanagement.TrainingManagement.entity.EmployeeRole;
 import trainingmanagement.TrainingManagement.entity.Roles;
 import trainingmanagement.TrainingManagement.request.MultipleEmployeeRequest;
-import trainingmanagement.TrainingManagement.response.EmployeeDetails;
-import trainingmanagement.TrainingManagement.response.EmployeeProfile;
 import trainingmanagement.TrainingManagement.response.RegistrationResponse;
 
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @Service
 public class SuperAdminService
