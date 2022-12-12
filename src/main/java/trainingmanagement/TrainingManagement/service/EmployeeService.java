@@ -332,7 +332,8 @@ public class EmployeeService
 
     public Map<Integer,List<Notification>> notification(String empId)
     {
-        String query1 = "select inviteId,courseId,empId from Invites where empId=? and acceptanceStatus is null and clearNotificationStatus = false order by inviteId desc";
+        String query1 = "select inviteId,Invites.courseId,empId,courseName from Invites,Course where Invites.courseId = Course.courseId and empId=? and\n" +
+                "acceptanceStatus is null and clearNotificationStatus = false order by inviteId desc";
         List<Notification> notification=jdbcTemplate.query(query1,new BeanPropertyRowMapper<>(Notification.class),empId);
         Map<Integer,List<Notification>> map=new HashMap<Integer,List<Notification>>();
         map.put(notification.size(),notification);
