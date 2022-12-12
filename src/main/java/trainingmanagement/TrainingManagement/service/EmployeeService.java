@@ -26,7 +26,7 @@ public class EmployeeService
     private String VIEW_COURSE_DETAILS = "SELECT courseId,courseName,trainer,trainingMode,startDate,endDate,duration,startTime,endTime,completionStatus,meetingInfo FROM Course WHERE courseId=? and deleteStatus=false";
     //for manager
     private String CHECK_COURSE_ALLOCATION = "SELECT courseId FROM ManagersCourses WHERE managerId=? AND courseId=?";
-    private String CHECK_IF_ACCEPTED = "SELECT courseId FROM AcceptedInvites where empId=? AND courseId=? and (deleteStatus=false)";
+    private String CHECK_IF_ACCEPTED = "SELECT courseId FROM Invites where empId=? AND courseId=? and (acceptanceStatus = true or acceptanceStatus is null);";
     private String GET_ROLE = "SELECT role_name FROM employee_role WHERE emp_id=?";
     int offset=0;
 
@@ -340,8 +340,9 @@ public class EmployeeService
             // Upload the image
             Map params1 = ObjectUtils.asMap(
                     "use_filename", true,
+                    "filename",empId,
                     "unique_filename", true,
-                    "overwrite", false,
+                    "overwrite", true,
                     "folder","trainingmanagement"
             );
             Map uploadResult = cloudinary.uploader().upload(profilePhoto.getBytes(), params1);
