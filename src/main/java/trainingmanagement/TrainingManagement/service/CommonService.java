@@ -517,7 +517,7 @@ public class CommonService
             jdbcTemplate.queryForObject(query, Integer.class,courseId,deleteStatus);
         }
         catch (Exception e) {
-            throw new CourseDeletionException("Course does not");
+            throw new CourseDeletionException("Course does not exist");
         }
     }
 

@@ -148,12 +148,35 @@ public class EmployeeController
         return ResponseEntity.status(HttpStatus.OK).body(employeeService.notificationCount(empId));
     }
 
+    @GetMapping("/invites")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee')")
+    public ResponseEntity<?> invites(Authentication authentication)
+    {
+        String empId = authentication.getName();
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.invites(empId));
+    }
+
+    @PutMapping("/clearNotification")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee')")
+    public void clearNotification(Authentication authentication)
+    {
+        String empId = authentication.getName();
+        employeeService.clearNotification(empId);
+    }
+
     @GetMapping("/notifications")
     @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee')")
     public ResponseEntity<?> notifications(Authentication authentication)
     {
         String empId = authentication.getName();
-        return ResponseEntity.status(HttpStatus.OK).body(employeeService.notifications(empId));
+        return ResponseEntity.status(HttpStatus.OK).body(employeeService.notification(empId));
+    }
+
+    @PutMapping("/reduceNotificationCount/{inviteId}")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee')")
+    public void reduceNotificationCount(@PathVariable int inviteId)
+    {
+        employeeService.reduceNotificationCount(inviteId);
     }
 
     @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee')")

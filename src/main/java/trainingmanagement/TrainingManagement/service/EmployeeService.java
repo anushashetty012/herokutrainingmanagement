@@ -315,15 +315,34 @@ public class EmployeeService
         }
     }
 
-    public Map<Integer,List<Notification>> notifications(String empId)
+    public Map<Integer,List<Notification>> invites(String empId)
     {
         String query1 = "select inviteId,courseId,empId from Invites where empId=? and acceptanceStatus is null order by inviteId desc";
-        List<Notification> n=jdbcTemplate.query(query1,new BeanPropertyRowMapper<>(Notification.class),empId);
-        String query2="update Invites set notificationSentStatus=1  where empId=? and acceptanceStatus is null";
-        jdbcTemplate.update(query2,empId);
+        List<Notification> invites=jdbcTemplate.query(query1,new BeanPropertyRowMapper<>(Notification.class),empId);
         Map<Integer,List<Notification>> map=new HashMap<Integer,List<Notification>>();
-        map.put(n.size(),n);
+        map.put(invites.size(),invites);
         return map;
+    }
+
+    public void clearNotification(String empId)
+    {
+        String query = "update Invites set clearNotificationStatus = true,notificationSentStatus=true where empId=?";
+        jdbcTemplate.update(query,empId);
+    }
+
+    public Map<Integer,List<Notification>> notification(String empId)
+    {
+        String query1 = "select inviteId,courseId,empId from Invites where empId=? and acceptanceStatus is null and clearNotificationStatus = false order by inviteId desc";
+        List<Notification> notification=jdbcTemplate.query(query1,new BeanPropertyRowMapper<>(Notification.class),empId);
+        Map<Integer,List<Notification>> map=new HashMap<Integer,List<Notification>>();
+        map.put(notification.size(),notification);
+        return map;
+    }
+
+    public void reduceNotificationCount(int inviteId)
+    {
+        String query = "update Invites set notificationSentStatus=true where inviteId = ?";
+        jdbcTemplate.update(query,inviteId);
     }
 
     //profile photo upload
