@@ -165,7 +165,24 @@ public class SuperAdminService
         message.setText(emailText);
         message.setSubject("Role changed");
         mailSender.send(message);
+        System.out.println(employeeRole.getRoleName());
+        if (employeeRole.getRoleName().equalsIgnoreCase("employee")||employeeRole.getRoleName().equalsIgnoreCase("admin"))
+        {
+            updateManagerTable(employeeRole.getEmpId());
+            updateManagersCourseTable(employeeRole.getEmpId());
+        }
         return "Role of "+employeeRole.getEmpId()+" changed to "+employeeRole.getRoleName();
+    }
+
+    public void updateManagerTable(String managerId)
+    {
+        String query = "update Manager set managerId = null where managerId=?";
+        jdbcTemplate.update(query,managerId);
+    }
+    public void updateManagersCourseTable(String managerId)
+    {
+        String query = "delete from ManagersCourses where managerId=?";
+        jdbcTemplate.update(query,managerId);
     }
 
     public void employeeExist(String empId) throws EmployeeExistException

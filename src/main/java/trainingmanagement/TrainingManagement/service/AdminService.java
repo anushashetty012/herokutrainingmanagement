@@ -200,6 +200,49 @@ public class AdminService
         return "Course allocated successfully";
     }
 
+    public String unassignCourseFromManager(int courseId, List<MultipleEmployeeRequest> courseToManager) throws ManagerNotExistException, SuperAdminIdException, EmployeeNotExistException, CourseDeletionException, CourseAssignedForManagerException {
+        isCourseExist(courseId,false);
+        checkValidityOfManagerListForUnAssigning(courseToManager,courseId);
+        int noOfManagers = courseToManager.size();
+        for (int i = 0; i < noOfManagers; i++)
+        {
+            String UNASSIGN_MANAGER = "delete from ManagersCourses where courseId=? and managerId=?";
+            jdbcTemplate.update(UNASSIGN_MANAGER, new Object[]{courseId,courseToManager.get(i).getEmpId()});
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("spring.email.from@gmail.com");
+            String query = "select email from employee where emp_id=?";
+            String query1 = "select courseName from Course where courseId=?";
+            String email = jdbcTemplate.queryForObject(query, String.class,courseToManager.get(i).getEmpId());
+            message.setTo(email);
+            String courseName = jdbcTemplate.queryForObject(query1, String.class,courseId);
+            String emailText ="You have been unassigned from "+courseName+" course";
+            message.setText(emailText);
+            message.setSubject("Course unassigned");
+            mailSender.send(message);
+        }
+        return "Course unallocated successfully";
+    }
+
+    public void checkValidityOfManagerListForUnAssigning(List<MultipleEmployeeRequest> courseToManager,int courseId) throws SuperAdminIdException, ManagerNotExistException, EmployeeNotExistException, CourseAssignedForManagerException {
+        for (MultipleEmployeeRequest emp:courseToManager)
+        {
+            checkEmployeeExist(emp.getEmpId());
+            checkManagerExist(emp.getEmpId());
+            isSuperAdminId(emp.getEmpId());
+            checkCourseAssignedToManager(emp.getEmpId(), courseId);
+        }
+    }
+
+    public void checkCourseAssignedToManager(String empId,int courseId) throws CourseAssignedForManagerException
+    {
+        String query = "select count(managerId) from ManagersCourses where managerId=? and courseId=?";
+        int count = jdbcTemplate.queryForObject(query, Integer.class,empId,courseId);
+        if (count==0)
+        {
+            throw new CourseAssignedForManagerException("This course is not assigned these managers");
+        }
+    }
+
     //Update Existing Course
     public Integer updateCourse(Course course) throws CourseInfoIntegrityException
     {

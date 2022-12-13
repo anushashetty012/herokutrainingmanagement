@@ -129,6 +129,23 @@ public class AdminController
         return ResponseEntity.of(Optional.of(assignStatus));
     }
 
+    @DeleteMapping("/unassignCourseFromManager/{courseId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<String> unassignCourseFromManager(@PathVariable int courseId, @RequestBody List<MultipleEmployeeRequest> courseToManager)
+    {
+        String unassignStatus;
+        try
+        {
+            unassignStatus = adminRepository.unassignCourseFromManager(courseId,courseToManager);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Refresh the page and try again");
+        }
+        return ResponseEntity.of(Optional.of(unassignStatus));
+    }
+
     @PutMapping("/update/course")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<?> updateCourse(@RequestBody Course course){
