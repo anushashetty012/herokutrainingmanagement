@@ -493,6 +493,31 @@ public class AdminService
         return null;
     }
 
+    public void assignStatusToEmployeeToManagerSearchList(List<EmployeesToManager> employeesToManagerList,String managerId)
+    {
+        for (EmployeesToManager emp:employeesToManagerList)
+        {
+            if (emp.getManagerId() != null && emp.getManagerId().equals(managerId))
+            {
+                emp.setStatus(true);
+            }
+        }
+    }
+    public List<EmployeesToManager> employeesToAssignManagerBySearchKey(String managerId,String searchKey) throws EmployeeNotExistException, ManagerNotExistException, SuperAdminIdException {
+        checkEmployeeExist(managerId);
+        checkManagerExist(managerId);
+        isSuperAdminId(managerId);
+        String query = "select employee.emp_id, emp_name, designation, managerId from employee, Manager \n" +
+                "where employee.emp_id=Manager.empId and employee.emp_id<>'RT001' and employee.emp_id<>? and employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?)";
+        List<EmployeesToManager> employeeDetails =  jdbcTemplate.query(query,new BeanPropertyRowMapper<EmployeesToManager>(EmployeesToManager.class),managerId,searchKey,"%"+searchKey+"%","%"+searchKey+"%");
+        assignStatusToEmployeeToManagerSearchList(employeeDetails,managerId);
+        if (employeeDetails.size() != 0)
+        {
+            return employeeDetails;
+        }
+        return null;
+    }
+
     public void checkManagerValid(String managerId) throws EmployeeNotExistException, ManagerNotExistException, SuperAdminIdException {
         checkEmployeeExist(managerId);
         checkManagerExist(managerId);

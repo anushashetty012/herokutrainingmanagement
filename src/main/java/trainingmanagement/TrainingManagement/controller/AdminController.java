@@ -184,6 +184,26 @@ public class AdminController
         return ResponseEntity.status(HttpStatus.OK).body(employees);
     }
 
+    @GetMapping("/employeesToAssignManager/search/{managerId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<?> employeesToAssignManagerBySearchKey(@PathVariable String managerId,@RequestParam String searchKey)
+    {
+        List<EmployeesToManager> employees;
+        try
+        {
+            employees = adminRepository.employeesToAssignManagerBySearchKey(managerId,searchKey);
+        }
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Refresh the page and try again");
+        }
+        if (employees == null)
+        {
+            return new ResponseEntity<>("No employees found",HttpStatus.OK);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(employees);
+    }
+
     @PutMapping("/assignManager/employees")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> assignManager(@RequestBody ManagerEmployees managerEmployees)
