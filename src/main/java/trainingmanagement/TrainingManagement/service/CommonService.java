@@ -333,7 +333,7 @@ public class CommonService
         },courseId,searchKey,"%"+searchKey+"%","%"+searchKey+"%");
 
         //Employees who rejected the invites and employees who are not invited
-        String query1 = "SELECT emp_id,emp_name,designation FROM employee WHERE employee.emp_id<>'RT001' and (employee.emp_id = ? or emp_name like ? or designation like ?) and employee.emp_id NOT IN (SELECT Invites.empId FROM Invites WHERE courseId=? and (acceptanceStatus=true or acceptanceStatus is null)) and delete_status=false";
+        String query1 = "SELECT emp_id,emp_name,designation FROM employee WHERE employee.emp_id<>'RT001' and employee.emp_id NOT IN (SELECT Invites.empId FROM Invites WHERE courseId=? and (acceptanceStatus=true or acceptanceStatus is null)) and delete_status=false and (employee.emp_id = ? or emp_name like ? or designation like ?)";
         employeeList1 = jdbcTemplate.query(query1,(rs, rowNum) -> {
             return new EmployeeInvite(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),false);
         },courseId,searchKey,"%"+searchKey+"%","%"+searchKey+"%");
@@ -360,10 +360,7 @@ public class CommonService
                 },empId,courseId,searchKey,"%"+searchKey+"%","%"+searchKey+"%");
 
                 //Employees who rejected the invites and employees who are not invited
-                String query1 = "SELECT emp_id,emp_name,designation FROM employee,Manager WHERE employee.emp_id=Manager.empId and Manager.managerId=? and employee.emp_id<>'RT001' " +
-                        "and (employee.emp_id = ? or emp_name like ? or designation like ?)"+
-                        "and employee.emp_id NOT IN (SELECT Invites.empId FROM Invites WHERE courseId=? and (acceptanceStatus=true or acceptanceStatus is null)) " +
-                        "and delete_status=false";
+                String query1 = "SELECT emp_id,emp_name,designation FROM employee,Manager WHERE employee.emp_id=Manager.empId and Manager.managerId=? and employee.emp_id<>'RT001' and employee.emp_id NOT IN (SELECT Invites.empId FROM Invites WHERE courseId=? and (acceptanceStatus=true or acceptanceStatus is null)) and delete_status=false and (employee.emp_id = ? or emp_name like ? or designation like ?)";
                 employeeList1 = jdbcTemplate.query(query1,(rs, rowNum) -> {
                     return new EmployeeInvite(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),false);
                 },empId,searchKey,"%"+searchKey+"%","%"+searchKey+"%",courseId);

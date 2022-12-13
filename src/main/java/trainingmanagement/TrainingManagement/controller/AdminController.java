@@ -70,9 +70,9 @@ public class AdminController
     //search managers by search key- to allocate reportees
     @GetMapping("/managersBySearchKey")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<?> getManagersBySearchKey(@RequestParam int page, @RequestParam int limit,@RequestParam String searchKey)
+    public ResponseEntity<?> getManagersBySearchKey(@RequestParam String searchKey)
     {
-        Map<Integer,List<EmployeeInfo>> managers = adminRepository.getManagersBySearchkey(page,limit,searchKey);
+        List<EmployeeInfo> managers = adminRepository.getManagersBySearchkey(searchKey);
         if (managers == null)
         {
             return new ResponseEntity<>("No match found",HttpStatus.OK);
@@ -102,9 +102,9 @@ public class AdminController
 
     @GetMapping("/managersToAssignCourse/searchKey/{courseId}")
     @PreAuthorize("hasRole('admin')")
-    public ResponseEntity<?> getManagersToAssignCourseBySearchKey(@PathVariable int courseId,@RequestParam int page, @RequestParam int limit,@RequestParam String searchKey)
+    public ResponseEntity<?> getManagersToAssignCourseBySearchKey(@PathVariable int courseId,@RequestParam String searchKey)
     {
-        Map<Integer,List<ManagerInfo>> managers = adminRepository.getManagersToAssignCourseBySearchkey(courseId,page,limit,searchKey);
+        List<ManagerInfo> managers = adminRepository.getManagersToAssignCourseBySearchkey(courseId,searchKey);
         if (managers == null)
         {
             return new ResponseEntity<>("No match found",HttpStatus.OK);
@@ -129,7 +129,7 @@ public class AdminController
         return ResponseEntity.of(Optional.of(assignStatus));
     }
 
-    @DeleteMapping("/unassignCourseFromManager/{courseId}")
+    @PutMapping("/unassignCourseFromManager/{courseId}")
     @PreAuthorize("hasRole('admin')")
     public ResponseEntity<String> unassignCourseFromManager(@PathVariable int courseId, @RequestBody List<MultipleEmployeeRequest> courseToManager)
     {
@@ -141,7 +141,6 @@ public class AdminController
         catch (Exception e)
         {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Refresh the page and try again");
         }
         return ResponseEntity.of(Optional.of(unassignStatus));
     }

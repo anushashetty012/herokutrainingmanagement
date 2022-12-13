@@ -102,28 +102,25 @@ public class AdminService
         return null;
     }
 
-    public List<ManagerInfo> getManagersAssignedToCourseBySearchkey(int courseId,int offset, int limit, String searchKey)
+    public List<ManagerInfo> getManagersAssignedToCourseBySearchkey(int courseId, String searchKey)
     {
-        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?) and employee_role.emp_id in (select managerId from ManagersCourses where courseId=?) LIMIT ?,?";
+        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?) and employee_role.emp_id in (select managerId from ManagersCourses where courseId=?)";
         List<ManagerInfo> employeeDetails =  jdbcTemplate.query(GET_MANAGERS,(rs, rowNum) -> {
             return new ManagerInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),true);
-        },searchKey,"%"+searchKey+"%","%"+searchKey+"%",courseId,offset,limit);
+        },searchKey,"%"+searchKey+"%","%"+searchKey+"%",courseId);
        return  employeeDetails;
     }
 
-    public Map<Integer,List<ManagerInfo>> getManagersToAssignCourseBySearchkey(int courseId,int page, int limit, String searchKey)
+    public List<ManagerInfo> getManagersToAssignCourseBySearchkey(int courseId, String searchKey)
     {
-        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?) and employee_role.emp_id not in (select managerId from ManagersCourses where courseId=?) LIMIT ?,?";
-        Map map = new HashMap<Integer,List>();
-        offset = limit *(page-1);
+        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?) and employee_role.emp_id not in (select managerId from ManagersCourses where courseId=?)";
         List<ManagerInfo> employeeDetails =  jdbcTemplate.query(GET_MANAGERS,(rs, rowNum) -> {
             return new ManagerInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),false);
-        },searchKey,"%"+searchKey+"%","%"+searchKey+"%",courseId,offset,limit);
-        employeeDetails.addAll(getManagersAssignedToCourseBySearchkey(courseId,offset,limit,searchKey));
+        },searchKey,"%"+searchKey+"%","%"+searchKey+"%",courseId);
+        employeeDetails.addAll(getManagersAssignedToCourseBySearchkey(courseId,searchKey));
         if (employeeDetails.size() != 0)
         {
-            map.put(employeeDetails.size(),employeeDetails);
-            return map;
+            return employeeDetails;
         }
         return null;
     }
@@ -143,18 +140,15 @@ public class AdminService
         return null;
     }
 
-    public Map<Integer,List<EmployeeInfo>> getManagersBySearchkey(int page, int limit, String searchKey)
+    public List<EmployeeInfo> getManagersBySearchkey(String searchKey)
     {
-        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?) LIMIT ?,?";
-        Map map = new HashMap<Integer,List>();
-        offset = limit *(page-1);
+        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?)";
         List<EmployeeInfo> employeeDetails =  jdbcTemplate.query(GET_MANAGERS,(rs, rowNum) -> {
             return new EmployeeInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"));
-        },searchKey,"%"+searchKey+"%","%"+searchKey+"%",offset,limit);
+        },searchKey,"%"+searchKey+"%","%"+searchKey+"%");
         if (employeeDetails.size() != 0)
         {
-            map.put(employeeDetails.size(),employeeDetails);
-            return map;
+            return employeeDetails;
         }
         return null;
     }

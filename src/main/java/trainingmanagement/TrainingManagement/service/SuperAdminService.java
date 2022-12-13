@@ -165,7 +165,6 @@ public class SuperAdminService
         message.setText(emailText);
         message.setSubject("Role changed");
         mailSender.send(message);
-        System.out.println(employeeRole.getRoleName());
         if (employeeRole.getRoleName().equalsIgnoreCase("employee")||employeeRole.getRoleName().equalsIgnoreCase("admin"))
         {
             updateManagerTable(employeeRole.getEmpId());
