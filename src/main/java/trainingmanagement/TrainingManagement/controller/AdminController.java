@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT, RequestMethod.PATCH},
+        origins = {"http://localhost:4200","https://thriving-croissant-5df179.netlify.app"})
 @RequestMapping("/admin")
 public class AdminController
 {

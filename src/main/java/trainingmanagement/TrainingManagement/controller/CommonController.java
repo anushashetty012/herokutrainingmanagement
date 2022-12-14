@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT, RequestMethod.PATCH},
+        origins = {"http://localhost:4200","https://thriving-croissant-5df179.netlify.app"})
 public class CommonController
 {
     @Autowired
@@ -51,7 +54,7 @@ public class CommonController
     @PreAuthorize("hasRole('admin') or hasRole('manager')")
     public ResponseEntity<?> getAttendeesAndNonAttendeesCount(@PathVariable int courseId,Authentication authentication)
     {
-        String employeeCount = commonService.getAttendeesAndNonAttendeesCount(courseId,authentication.getName());
+        AttendeesNonAttendeesCount employeeCount = commonService.getAttendeesAndNonAttendeesCount(courseId,authentication.getName());
         if (employeeCount == null)
         {
             return new ResponseEntity<>("This course is not allocated to you or there are no attendees for this course or the course may be deleted",HttpStatus.NOT_FOUND);

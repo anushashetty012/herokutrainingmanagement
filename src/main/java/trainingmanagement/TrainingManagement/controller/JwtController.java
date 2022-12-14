@@ -6,10 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import trainingmanagement.TrainingManagement.customException.EmployeeNotExistException;
 import trainingmanagement.TrainingManagement.entity.JwtRequest;
 import trainingmanagement.TrainingManagement.entity.JwtResponse;
@@ -18,7 +15,9 @@ import trainingmanagement.TrainingManagement.service.JwtService;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT, RequestMethod.PATCH},
+        origins = {"http://localhost:4200","https://thriving-croissant-5df179.netlify.app"})
 public class JwtController {
 
     @Autowired

@@ -78,19 +78,23 @@ public class CommonService
         return jdbcTemplate.queryForObject(GET_ROLE,new Object[]{empId},String.class);
     }
 
-    public String getAttendeesAndNonAttendeesForAdmin(int courseId)
+    public AttendeesNonAttendeesCount getAttendeesAndNonAttendeesForAdmin(int courseId)
     {
         try
         {
             int attendeesCount = jdbcTemplate.queryForObject(GET_ATTENDEES_COUNT,new Object[]{courseId},Integer.class);
             int nonAttendeesCount = jdbcTemplate.queryForObject(GET_NON_ATTENDEES_COUNT,new Object[]{courseId},Integer.class);
             String completionStatus = jdbcTemplate.queryForObject(GET_COMPLETION_STATUS,new Object[]{courseId},String.class);
+            AttendeesNonAttendeesCount count = new AttendeesNonAttendeesCount();
             if (completionStatus.equalsIgnoreCase("active") || completionStatus.equalsIgnoreCase("upcoming"))
             {
-                return "Attendees: "+attendeesCount;
+                count.setAttendees(attendeesCount);
+                return count;
             }
             int attendeesforCompletedCourse = jdbcTemplate.queryForObject("select count(empId) from AcceptedInvites where courseId=? and deleteStatus=false",new Object[]{courseId}, Integer.class);
-            return "Attendees: "+attendeesforCompletedCourse+"\nNon Attendees: "+nonAttendeesCount;
+            count.setAttendees(attendeesforCompletedCourse);
+            count.setNonAttendees(nonAttendeesCount);
+            return count;
         }
         catch (DataAccessException e)
         {
@@ -98,7 +102,7 @@ public class CommonService
         }
     }
 
-    public String getAttendeesAndNonAttendeesForManager(int courseId, String empId)
+    public AttendeesNonAttendeesCount getAttendeesAndNonAttendeesForManager(int courseId, String empId)
     {
         try
         {
@@ -110,12 +114,16 @@ public class CommonService
                 int attendeesCount = jdbcTemplate.queryForObject(GET_ATTENDEES_COUNT,new Object[]{courseId},Integer.class);
                 int nonAttendeesCount = jdbcTemplate.queryForObject(GET_NON_ATTENDEES_COUNT,new Object[]{courseId},Integer.class);
                 String completionStatus = jdbcTemplate.queryForObject(GET_COMPLETION_STATUS,new Object[]{courseId},String.class);
+                AttendeesNonAttendeesCount count = new AttendeesNonAttendeesCount();
                 if (completionStatus.equalsIgnoreCase("active") || completionStatus.equalsIgnoreCase("upcoming"))
                 {
-                    return "Attendees: "+attendeesCount;
+                    count.setAttendees(attendeesCount);
+                    return count;
                 }
                 int attendeesforCompletedCourse = jdbcTemplate.queryForObject("select count(empId) from AcceptedInvites where courseId=? and deleteStatus=false",new Object[]{courseId}, Integer.class);
-                return "Attendees: "+attendeesforCompletedCourse+"\nNon Attendees: "+nonAttendeesCount;
+                count.setAttendees(attendeesforCompletedCourse);
+                count.setNonAttendees(nonAttendeesCount);
+                return count;
             }
         }
         catch (DataAccessException e)
@@ -125,16 +133,16 @@ public class CommonService
         return null;
     }
 
-    public String getAttendeesAndNonAttendeesCount(int courseId,String empId)
+    public AttendeesNonAttendeesCount getAttendeesAndNonAttendeesCount(int courseId,String empId)
     {
         if(getRole((empId)).equalsIgnoreCase("admin"))
         {
-            String employeeCount = getAttendeesAndNonAttendeesForAdmin(courseId);
+            AttendeesNonAttendeesCount employeeCount = getAttendeesAndNonAttendeesForAdmin(courseId);
             return employeeCount;
         }
         if (getRole((empId)).equalsIgnoreCase("manager"))
         {
-            String employeeCount = getAttendeesAndNonAttendeesForManager(courseId,empId);
+            AttendeesNonAttendeesCount employeeCount = getAttendeesAndNonAttendeesForManager(courseId,empId);
             return employeeCount;
         }
         return null;

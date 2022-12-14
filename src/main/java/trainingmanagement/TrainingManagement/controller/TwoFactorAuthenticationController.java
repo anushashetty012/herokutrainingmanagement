@@ -12,6 +12,9 @@ import trainingmanagement.TrainingManagement.service.EmailOtpService;
 import java.util.Random;
 
 @RestController
+@CrossOrigin(
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT, RequestMethod.PATCH},
+        origins = {"http://localhost:4200","https://thriving-croissant-5df179.netlify.app"})
 public class TwoFactorAuthenticationController
 {
     @Autowired
