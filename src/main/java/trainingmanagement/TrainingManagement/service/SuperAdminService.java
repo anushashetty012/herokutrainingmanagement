@@ -86,6 +86,10 @@ public class SuperAdminService
         {
             throw new InvalidEmployeeDetailsException("Employee id cannot be null");
         }
+        if ((employee.getEmpId().trim()).length()!=6)
+        {
+            throw new InvalidEmployeeDetailsException("Employee id should be 6 characters");
+        }
         if ((employee.getEmpName().trim()).isEmpty())
         {
             throw new InvalidEmployeeDetailsException("Employee name cannot be null");

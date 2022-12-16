@@ -182,7 +182,7 @@ public class EmployeeController
         employeeService.reduceNotificationCount(inviteId);
     }
 
-    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee')")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee') or hasRole('super_admin')")
     @PutMapping("/uploadProfilePhoto")
     public ResponseEntity<?> uploadIProfile(@RequestParam("file") MultipartFile file, Authentication authentication)
     {
@@ -201,7 +201,7 @@ public class EmployeeController
         return ResponseEntity.status(HttpStatus.OK).body(uploadResponse);
     }
 
-    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee')")
+    @PreAuthorize("hasRole('admin') or hasRole('manager') or hasRole('employee') or hasRole('super_admin')")
     @GetMapping("/viewProfilePhoto")
     public ResponseEntity<?> retrieveProfileLink(Authentication authentication) throws Exception
     {

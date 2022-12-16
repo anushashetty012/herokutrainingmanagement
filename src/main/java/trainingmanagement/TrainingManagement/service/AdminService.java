@@ -113,10 +113,10 @@ public class AdminService
 
     public List<ManagerInfo> getManagersToAssignCourseBySearchkey(int courseId, String searchKey)
     {
-        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?) and employee_role.emp_id not in (select managerId from ManagersCourses where courseId=?)";
+        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id like ? or employee.emp_name like ? or employee.designation like ?) and employee_role.emp_id not in (select managerId from ManagersCourses where courseId=?)";
         List<ManagerInfo> employeeDetails =  jdbcTemplate.query(GET_MANAGERS,(rs, rowNum) -> {
             return new ManagerInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"),false);
-        },searchKey,"%"+searchKey+"%","%"+searchKey+"%",courseId);
+        },"%"+searchKey+"%","%"+searchKey+"%","%"+searchKey+"%",courseId);
         employeeDetails.addAll(getManagersAssignedToCourseBySearchkey(courseId,searchKey));
         if (employeeDetails.size() != 0)
         {
@@ -142,10 +142,10 @@ public class AdminService
 
     public List<EmployeeInfo> getManagersBySearchkey(String searchKey)
     {
-        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?)";
+        String GET_MANAGERS = "SELECT employee.emp_id,emp_name,designation FROM employee, employee_role WHERE employee.emp_id = employee_role.emp_id and employee_role.role_name='manager' AND employee.delete_status=false and (employee.emp_id like ? or employee.emp_name like ? or employee.designation like ?)";
         List<EmployeeInfo> employeeDetails =  jdbcTemplate.query(GET_MANAGERS,(rs, rowNum) -> {
             return new EmployeeInfo(rs.getString("emp_id"),rs.getString("emp_name"),rs.getString("designation"));
-        },searchKey,"%"+searchKey+"%","%"+searchKey+"%");
+        },"%"+searchKey+"%","%"+searchKey+"%","%"+searchKey+"%");
         if (employeeDetails.size() != 0)
         {
             return employeeDetails;
@@ -508,8 +508,8 @@ public class AdminService
         checkManagerExist(managerId);
         isSuperAdminId(managerId);
         String query = "select employee.emp_id, emp_name, designation, managerId from employee, Manager \n" +
-                "where employee.emp_id=Manager.empId and employee.emp_id<>'RT001' and employee.emp_id<>? and employee.delete_status=false and (employee.emp_id=? or employee.emp_name like ? or employee.designation like ?)";
-        List<EmployeesToManager> employeeDetails =  jdbcTemplate.query(query,new BeanPropertyRowMapper<EmployeesToManager>(EmployeesToManager.class),managerId,searchKey,"%"+searchKey+"%","%"+searchKey+"%");
+                "where employee.emp_id=Manager.empId and employee.emp_id<>'RT001' and employee.emp_id<>? and employee.delete_status=false and (employee.emp_id like ? or employee.emp_name like ? or employee.designation like ?)";
+        List<EmployeesToManager> employeeDetails =  jdbcTemplate.query(query,new BeanPropertyRowMapper<EmployeesToManager>(EmployeesToManager.class),managerId,"%"+searchKey+"%","%"+searchKey+"%","%"+searchKey+"%");
         assignStatusToEmployeeToManagerSearchList(employeeDetails,managerId);
         if (employeeDetails.size() != 0)
         {
